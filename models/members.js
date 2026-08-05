@@ -13,6 +13,9 @@ const transactionSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  comments:{
+    type:String,
+  },
 })
 
 const memberSchema = new mongoose.Schema(

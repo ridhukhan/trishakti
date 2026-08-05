@@ -17,7 +17,7 @@ export async function GET(req, { params }) {
 export async function POST(req, { params }) {
   try {
     const { id } = await params
-    const { date, joma, uttolon } = await req.json()
+    const { date, joma, uttolon,comments } = await req.json()
     await connectDB()
 
     const updatedMember = await Member.findByIdAndUpdate(
@@ -28,6 +28,7 @@ export async function POST(req, { params }) {
             date,
             joma: Number(joma) || 0,
             uttolon: Number(uttolon) || 0,
+            comments,
           },
         },
       },
@@ -44,7 +45,7 @@ export async function POST(req, { params }) {
 export async function PUT(req, { params }) {
   try {
     const { id } = await params
-    const { action, transactionId, date, joma, uttolon } = await req.json()
+    const { action, transactionId, date, joma, uttolon ,comments} = await req.json()
     await connectDB()
 
     if (action === "edit") {
@@ -56,6 +57,7 @@ export async function PUT(req, { params }) {
             "transactions.$.date": date,
             "transactions.$.joma": Number(joma) || 0,
             "transactions.$.uttolon": Number(uttolon) || 0,
+            "transactions.$.comments": comments,
           },
         },
         { new: true }

@@ -14,6 +14,7 @@ export default function MemberDetails({ params }) {
   const [date, setDate] = useState("")
   const [joma, setJoma] = useState("")
   const [uttolon, setUttolon] = useState("")
+  const [comments,setComments]=useState("")
 
   useEffect(() => {
     fetchMemberDetails()
@@ -43,6 +44,7 @@ export default function MemberDetails({ params }) {
           date,
           joma,
           uttolon,
+          comments,
         }),
       })
     } else {
@@ -50,7 +52,7 @@ export default function MemberDetails({ params }) {
       await fetch(`/api/members/${id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date, joma, uttolon }),
+        body: JSON.stringify({ date, joma, uttolon ,comments}),
       })
     }
 
@@ -58,6 +60,7 @@ export default function MemberDetails({ params }) {
     setDate("")
     setJoma("")
     setUttolon("")
+    setComments("")
     setEditingTx(null)
     setShowpopup(false)
     fetchMemberDetails()
@@ -97,10 +100,12 @@ export default function MemberDetails({ params }) {
         {member.transactions?.map((item) => (
           <div key={item._id} className="bg-amber-500 text-black p-3 rounded-lg flex justify-between items-center font-bold">
             <div>
-              <p className="text-xs text-gray-800">📅 {item.date}</p>
+              <p className="text-xs text-gray-800"> {item.date}</p>
               <div className="flex gap-3 text-sm mt-1">
                 <span className="text-green-900">জমা: ৳{item.joma}</span>
                 <span className="text-red-900">উত্তোলন: ৳{item.uttolon}</span>
+                <span className="text-black-500">comment:-{item.comments}</span>
+
               </div>
             </div>
 
@@ -113,6 +118,7 @@ export default function MemberDetails({ params }) {
                     setDate(item.date)
                     setJoma(item.joma)
                     setUttolon(item.uttolon)
+                    setComments(item.comments)
                     setShowpopup(true)
                   }}
                   className="bg-blue-600 text-white text-xs px-2 py-1 rounded"
@@ -147,6 +153,7 @@ export default function MemberDetails({ params }) {
               setDate("")
               setJoma("")
               setUttolon("")
+              setComments("")
               setShowpopup(true)
             }}
             className="bg-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-red-700 text-white"
@@ -186,7 +193,13 @@ export default function MemberDetails({ params }) {
               placeholder="উত্তোলন (৳)"
               className="border w-full p-2 mb-4 rounded"
             />
-
+             <input
+              type="text"
+              value={comments}
+              onChange={(e) => setComments(e.target.value)}
+              placeholder="ENTER COMMENTS"
+              className="border w-full p-2 mb-3 rounded"
+            />
             <div className="flex justify-between font-bold">
               <button onClick={handleSaveTransaction} className="bg-green-600 text-white px-4 py-2 rounded">
                 SAVE
