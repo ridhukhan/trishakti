@@ -4,15 +4,21 @@ import { useState, useEffect, use } from "react"
 export default function MemberDetails({ params }) {
   const { id } = use(params)
   const [member, setMember] = useState(null)
+  const [isAdmin, setIsAdmin] = useState(false)
+  
+  // Modal State
   const [showpopup, setShowpopup] = useState(false)
+  const [editingTx, setEditingTx] = useState(null) // Edit transaction object
 
-  // Form states
+  // Form states (date is text field for manual date typing)
   const [date, setDate] = useState("")
   const [joma, setJoma] = useState("")
   const [uttolon, setUttolon] = useState("")
 
   useEffect(() => {
     fetchMemberDetails()
+    const adminState = localStorage.getItem("isAdmin")
+    if (adminState === "true") setIsAdmin(true)
   }, [])
 
   const fetchMemberDetails = async () => {
@@ -21,29 +27,61 @@ export default function MemberDetails({ params }) {
     setMember(data)
   }
 
+  // Save transaction (New or Edit)
   const handleSaveTransaction = async (e) => {
     e.preventDefault()
     if (!date) return alert("তারিখ দিন!")
 
-    await fetch(`/api/members/${id}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ date, joma, uttolon }),
-    })
+    if (editingTx) {
+      // Update transaction
+      await fetch(`/api/members/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "edit",
+          transactionId: editingTx._id,
+          date,
+          joma,
+          uttolon,
+        }),
+      })
+    } else {
+      // Add new transaction
+      await fetch(`/api/members/${id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date, joma, uttolon }),
+      })
+    }
 
     // Reset Form
     setDate("")
     setJoma("")
     setUttolon("")
+    setEditingTx(null)
     setShowpopup(false)
-    fetchMemberDetails() // নতুন হিসাব সহ রিফ্রেশ
+    fetchMemberDetails()
   }
 
-  if (!member) return <div className="text-center mt-10 font-bold">Loading...</div>
+  // Delete Transaction
+  const handleDeleteTransaction = async (transactionId) => {
+    if (!confirm("আপনি কি নিশ্চিত এই হিসাবটি মুছে ফেলতে চান?")) return
+    await fetch(`/api/members/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "delete",
+        transactionId,
+      }),
+    })
+    fetchMemberDetails()
+  }
 
-  // Total Calculation (মোট জমা - মোট উত্তোলন)
+  if (!member) return <div className="text-center mt-10 font-bold text-white">Loading...</div>
+
+  // Total Calculation
   const totalBalance = member.transactions?.reduce((acc, item) => {
-    return acc + (item.joma || 0) - (item.uttolon || 0)
+    return acc + (Number(item.joma) || 0) - (Number(item.uttolon) || 0)
   }, 0) || 0
 
   return (
@@ -56,42 +94,82 @@ export default function MemberDetails({ params }) {
 
       {/* Transaction List */}
       <div className="mt-5 space-y-3 max-w-md mx-auto">
-        {member.transactions?.map((item, index) => (
-          <div key={index} className="bg-amber-500 text-black p-3 rounded-lg flex justify-between font-bold">
-            <span>📅 {item.date}</span>
-            <span className="text-green-800">জমা: ৳{item.joma}</span>
-            <span className="text-red-800">উত্তোলন: ৳{item.uttolon}</span>
+        {member.transactions?.map((item) => (
+          <div key={item._id} className="bg-amber-500 text-black p-3 rounded-lg flex justify-between items-center font-bold">
+            <div>
+              <p className="text-xs text-gray-800">📅 {item.date}</p>
+              <div className="flex gap-3 text-sm mt-1">
+                <span className="text-green-900">জমা: ৳{item.joma}</span>
+                <span className="text-red-900">উত্তোলন: ৳{item.uttolon}</span>
+              </div>
+            </div>
+
+            {/* Edit & Delete for Admin */}
+            {isAdmin && (
+              <div className="flex gap-1">
+                <button
+                  onClick={() => {
+                    setEditingTx(item)
+                    setDate(item.date)
+                    setJoma(item.joma)
+                    setUttolon(item.uttolon)
+                    setShowpopup(true)
+                  }}
+                  className="bg-blue-600 text-white text-xs px-2 py-1 rounded"
+                >
+                  ✏️
+                </button>
+                <button
+                  onClick={() => handleDeleteTransaction(item._id)}
+                  className="bg-red-600 text-white text-xs px-2 py-1 rounded"
+                >
+                  🗑️
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>
 
-      {/* Total Balance Display */}
+      {/* Total Balance */}
       <div className="mt-6 text-center">
         <div className="inline-block bg-yellow-400 text-black text-2xl font-bold px-6 py-2 rounded-full shadow-lg">
           Total: ৳{totalBalance}
         </div>
       </div>
 
-      {/* Add Button */}
-      <div className="text-center text-4xl font-bold text-yellow-400 mt-6">
-        <button 
-          onClick={() => setShowpopup(true)}
-          className="bg-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-red-700"
-        >
-          +
-        </button>
-      </div>
+      {/* Add Button (Admin Only) */}
+      {isAdmin && (
+        <div className="text-center text-4xl font-bold text-yellow-400 mt-6">
+          <button
+            onClick={() => {
+              setEditingTx(null)
+              setDate("")
+              setJoma("")
+              setUttolon("")
+              setShowpopup(true)
+            }}
+            className="bg-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-red-700 text-white"
+          >
+            +
+          </button>
+        </div>
+      )}
 
-      {/* Popup Modal */}
+      {/* Add / Edit Transaction Modal */}
       {showpopup && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4">
           <div className="bg-white text-black p-5 rounded-lg w-80 shadow-2xl">
-            <h2 className="text-xl font-bold mb-4 text-center">নতুন হিসাব যোগ করুন</h2>
-            
+            <h2 className="text-xl font-bold mb-4 text-center">
+              {editingTx ? "হিসাব এডিট করুন" : "নতুন হিসাব যোগ করুন"}
+            </h2>
+
+            {/* Manual Date Input */}
             <input
-              type="date"
+              type="text"
               value={date}
               onChange={(e) => setDate(e.target.value)}
+              placeholder="তারিখ লিখুন (যেমন: 05/08/2026)"
               className="border w-full p-2 mb-3 rounded"
             />
             <input
@@ -110,16 +188,10 @@ export default function MemberDetails({ params }) {
             />
 
             <div className="flex justify-between font-bold">
-              <button 
-                onClick={handleSaveTransaction}
-                className="bg-green-600 text-white px-4 py-2 rounded"
-              >
+              <button onClick={handleSaveTransaction} className="bg-green-600 text-white px-4 py-2 rounded">
                 SAVE
               </button>
-              <button 
-                onClick={() => setShowpopup(false)}
-                className="bg-gray-500 text-white px-4 py-2 rounded"
-              >
+              <button onClick={() => setShowpopup(false)} className="bg-gray-500 text-white px-4 py-2 rounded">
                 CANCEL
               </button>
             </div>
