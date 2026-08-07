@@ -167,7 +167,7 @@ export default function Shonchoi() {
                       setEditMember(item)
                       setName(item.name)
                       setAdress(item.adress)
-                      setAdress(item.phone)
+                      setPhone(item.phone)
 
                       setShowAddPopup(true)
                     }}
