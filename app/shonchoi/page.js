@@ -71,7 +71,7 @@ export default function Shonchoi() {
       await fetch("/api/members", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: editMember._id, name, adress }),
+        body: JSON.stringify({ id: editMember._id, name, adress,phone }),
       })
     } else {
       // Add mode
@@ -150,7 +150,7 @@ export default function Shonchoi() {
                 <div className="flex justify-between items-center bg-amber-500 text-black p-3.5 rounded-2xl shadow-lg hover:bg-amber-400 transition">
                   <div>
                     <h1 className="font-bold text-lg">{item.name}</h1>
-                     <p className="text-xl text-black-800">{item.phone}</p>
+                     <p className="text-xs text-gray-800">{item.phone}</p>
                     <p className="text-xs text-gray-800">{item.adress}</p>
                   </div>
                   <div className="bg-amber-600 text-white px-3 py-1 rounded-lg font-bold text-sm">
