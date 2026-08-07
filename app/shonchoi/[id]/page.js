@@ -90,6 +90,8 @@ export default function MemberDetails({ params }) {
       <nav className="bg-fuchsia-800 p-4 text-center rounded shadow">
         <h1 className="text-2xl font-bold text-yellow-400">{member.name}</h1>
         <p className="text-sm">{member.adress}</p>
+        <p className="text-sm">{member.phone}</p>
+
       </nav>
 
       {/* Transaction List */}
