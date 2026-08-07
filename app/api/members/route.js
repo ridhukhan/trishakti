@@ -14,7 +14,7 @@ export async function GET() {
 
 export async function POST(req) {
   try {
-    const { name, adress } = await req.json()
+    const { name, adress,phone } = await req.json()
     await connectDB()
     const newMember = await Member.create({ name, adress })
     return NextResponse.json(newMember, { status: 201 })
@@ -25,7 +25,7 @@ export async function POST(req) {
 
 export async function PUT(req) {
   try {
-    const { id, name, adress } = await req.json()
+    const { id, name, adress ,phone} = await req.json()
     await connectDB()
     const updated = await Member.findByIdAndUpdate(id, { name, adress }, { new: true })
     return NextResponse.json(updated, { status: 200 })

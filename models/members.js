@@ -28,6 +28,9 @@ const memberSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    phone:{
+       type: String,
+    },
     transactions: [transactionSchema],
   },
   { timestamps: true }

@@ -6,11 +6,8 @@ export default function MemberDetails({ params }) {
   const [member, setMember] = useState(null)
   const [isAdmin, setIsAdmin] = useState(false)
   
-  // Modal State
   const [showpopup, setShowpopup] = useState(false)
-  const [editingTx, setEditingTx] = useState(null) // Edit transaction object
-
-  // Form states (date is text field for manual date typing)
+  const [editingTx, setEditingTx] = useState(null) 
   const [date, setDate] = useState("")
   const [joma, setJoma] = useState("")
   const [uttolon, setUttolon] = useState("")

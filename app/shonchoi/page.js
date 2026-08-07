@@ -14,6 +14,8 @@ export default function Shonchoi() {
   // Form states
   const [name, setName] = useState("")
   const [adress, setAdress] = useState("")
+  const [phone, setPhone] = useState("")
+
   const [pinInput, setPinInput] = useState("")
 
   useEffect(() => {
@@ -76,12 +78,13 @@ export default function Shonchoi() {
       await fetch("/api/members", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, adress }),
+        body: JSON.stringify({ name, adress ,phone}),
       })
     }
 
     setName("")
     setAdress("")
+    setPhone("")
     setEditMember(null)
     setShowAddPopup(false)
     fetchMembers()
@@ -147,6 +150,7 @@ export default function Shonchoi() {
                 <div className="flex justify-between items-center bg-amber-500 text-black p-3.5 rounded-2xl shadow-lg hover:bg-amber-400 transition">
                   <div>
                     <h1 className="font-bold text-lg">{item.name}</h1>
+                     <p className="text-xl text-black-800">{item.phone}</p>
                     <p className="text-xs text-gray-800">{item.adress}</p>
                   </div>
                   <div className="bg-amber-600 text-white px-3 py-1 rounded-lg font-bold text-sm">
@@ -163,6 +167,8 @@ export default function Shonchoi() {
                       setEditMember(item)
                       setName(item.name)
                       setAdress(item.adress)
+                      setAdress(item.phone)
+
                       setShowAddPopup(true)
                     }}
                     className="bg-blue-600 text-white text-xs px-2.5 py-3 rounded-xl font-bold hover:bg-blue-700"
@@ -190,6 +196,7 @@ export default function Shonchoi() {
               setEditMember(null)
               setName("")
               setAdress("")
+              setPhone("")
               setShowAddPopup(true)
             }}
             className="bg-white text-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-gray-100"
@@ -218,6 +225,13 @@ export default function Shonchoi() {
               value={adress}
               onChange={(e) => setAdress(e.target.value)}
               placeholder="Enter address"
+              className="border w-full p-2 mb-4 rounded"
+            />
+            <input
+              type="text"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="মোবাইল নাম্বার লিখুন "
               className="border w-full p-2 mb-4 rounded"
             />
             <div className="flex justify-between font-bold">
