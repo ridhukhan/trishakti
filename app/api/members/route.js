@@ -16,7 +16,7 @@ export async function POST(req) {
   try {
     const { name, adress,phone } = await req.json()
     await connectDB()
-    const newMember = await Member.create({ name, adress })
+    const newMember = await Member.create({ name, adress,phone })
     return NextResponse.json(newMember, { status: 201 })
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
@@ -27,7 +27,7 @@ export async function PUT(req) {
   try {
     const { id, name, adress ,phone} = await req.json()
     await connectDB()
-    const updated = await Member.findByIdAndUpdate(id, { name, adress }, { new: true })
+    const updated = await Member.findByIdAndUpdate(id, { name, adress,phone }, { new: true })
     return NextResponse.json(updated, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
