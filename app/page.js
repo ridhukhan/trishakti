@@ -15,14 +15,7 @@ export default function Home() {
 
       {/* Main Content Section */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-100 mb-2">
-            হিসাব খাতা ড্যাশবোর্ড
-          </h2>
-          <p className="text-slate-400 text-sm md:text-base">
-            সহজ ও নিরাপদ উপায়ে আপনার সকল সঞ্চয় ও ঋণের হিসাব পরিচালনা করুন
-          </p>
-        </div>
+        
 
         {/* Dashboard Navigation Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
