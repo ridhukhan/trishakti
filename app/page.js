@@ -6,10 +6,11 @@ export default function Home() {
       {/* Header Section */}
       <header className="bg-slate-800 border-b border-slate-700 shadow-lg py-6 text-center px-4">
         <h1 className="font-extrabold text-3xl md:text-5xl text-amber-400 tracking-wide drop-shadow-md">
-          ত্রি-শক্তি ফাউনডেশন
+          ত্রি-শক্তি ফাউন্ডেশন
         </h1>
+        <h3 className="mt-5 text-cyan-400">(একটি ধর্মীয় সেবামূলক সংগঠন)</h3>
         <p className="text-slate-400 text-sm md:text-base mt-1 font-medium tracking-wider">
-          SINCE 2017
+          প্রতিষ্ঠানকাল - ২১/০৫/২০০৭
         </p>
       </header>
 
