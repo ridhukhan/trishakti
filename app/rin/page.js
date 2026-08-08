@@ -133,15 +133,8 @@ export default function RinPage() {
         </div>
       </nav>
 
-      {/* Grand Total Oboshishto Banner */}
-      <div className="text-center my-6">
-        <div className="inline-block bg-gradient-to-r from-amber-400 to-yellow-500 text-black px-6 py-3 rounded-2xl shadow-xl font-extrabold text-xl border-2 border-yellow-300">
-          সর্বমোট অবশিষ্ট: ৳ {grandOboshishto}
-        </div>
-      </div>
-
       {/* Member Cards */}
-      <div className="flex flex-col items-center gap-3.5 px-4 max-w-md mx-auto">
+      <div className="flex flex-col items-center gap-3.5 px-4 max-w-md mx-auto mt-6">
         {list.map((item) => {
           const totalPayable = (Number(item.ashol) || 0) + (Number(item.lab) || 0)
           const totalJoma = item.transactions?.reduce((sum, t) => sum + (Number(t.joma) || 0), 0) || 0
@@ -165,9 +158,11 @@ export default function RinPage() {
 
                   <div className="grid grid-cols-2 gap-2 text-xs bg-slate-900/60 p-2.5 rounded-xl text-gray-300 my-2">
                     <p>আসল: <span className="font-bold text-white">৳{item.ashol}</span></p>
-                    <p>লাভ/মুনাফা: <span className="font-bold text-emerald-400">৳{item.lab}</span></p>
+                    <p>লাভ: <span className="font-bold text-emerald-400">৳{item.lab}</span></p>
                     <p>মোবাইল: <span className="text-white">{item.phone || "N/A"}</span></p>
-                    <p>ঠিকানা: <span className="text-white">{item.adress}</span></p>
+                    <p className="col-span-2 whitespace-pre-line">
+                      ঠিকানা: <span className="text-white">{item.adress}</span>
+                    </p>
                   </div>
                 </div>
               </Link>
@@ -203,9 +198,16 @@ export default function RinPage() {
         })}
       </div>
 
+      {/* Grand Total Oboshishto Banner (Placed below all members) */}
+      <div className="text-center my-6 px-4 max-w-md mx-auto">
+        <div className="w-full bg-gradient-to-r from-amber-400 to-yellow-500 text-black py-3 rounded-2xl shadow-xl font-extrabold text-xl border-2 border-yellow-300">
+          সর্বমোট অবশিষ্ট: ৳ {grandOboshishto}
+        </div>
+      </div>
+
       {/* Floating Add Button */}
       {isAdmin && (
-        <div className="text-center mt-8">
+        <div className="text-center mt-4">
           <button
             onClick={() => {
               resetForm()
@@ -262,12 +264,14 @@ export default function RinPage() {
               placeholder="মোবাইল নম্বর"
               className="bg-slate-900 border border-slate-700 w-full p-2.5 rounded-xl text-sm outline-none focus:border-amber-400"
             />
-            <input
-              type="text"
+            
+            {/* Address Textarea */}
+            <textarea
               value={adress}
               onChange={(e) => setAdress(e.target.value)}
               placeholder="ঠিকানা *"
-              className="bg-slate-900 border border-slate-700 w-full p-2.5 rounded-xl text-sm outline-none focus:border-amber-400"
+              rows={3}
+              className="bg-slate-900 border border-slate-700 w-full p-2.5 rounded-xl text-sm outline-none focus:border-amber-400 resize-none"
             />
 
             <div className="flex justify-between font-bold pt-2">
