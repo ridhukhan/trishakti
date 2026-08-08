@@ -1,5 +1,5 @@
 import { connectDB } from "@/lib/mongodb"
-import Rinmember from "@/models/rinmember"
+import Rinmember from "@/models/rinmembers"
 import { NextResponse } from "next/server"
 
 export async function GET(req, { params }) {
