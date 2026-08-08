@@ -93,7 +93,6 @@ export default function RinMemberDetails({ params }) {
         </Link>
         <nav className="bg-slate-800 border border-slate-700 p-4 text-center rounded-2xl shadow-lg">
           <h1 className="text-2xl font-bold text-amber-400">{member.name}</h1>
-          <p className="text-xs text-gray-400 mt-0.5">📅 ঋণ গ্রহণের তারিখ: {member.date}</p>
           <div className="flex justify-center gap-4 text-xs mt-3 bg-slate-900/80 p-2 rounded-xl text-gray-300">
             <p>আসল: <span className="font-bold text-white">৳{member.ashol}</span></p>
             <p>লাভ: <span className="font-bold text-emerald-400">৳{member.lab}</span></p>

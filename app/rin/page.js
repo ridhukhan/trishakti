@@ -147,7 +147,6 @@ export default function RinPage() {
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <h1 className="font-bold text-lg text-amber-400">{item.name}</h1>
-                      <p className="text-xs text-gray-400">📅 ঋণ দেওয়ার তারিখ: {item.date}</p>
                     </div>
                     <div className="text-right">
                       <span className="text-xs bg-red-950 text-red-300 border border-red-800 px-2.5 py-1 rounded-full font-bold">
