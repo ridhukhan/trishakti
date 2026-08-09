@@ -10,6 +10,9 @@ export default function RinMemberDetails({ params }) {
   // Modal State
   const [showpopup, setShowpopup] = useState(false)
   const [editingTx, setEditingTx] = useState(null)
+  
+  // Loading State for Save Button
+  const [isSaving, setIsSaving] = useState(false)
 
   // Form states (Only date, joma, comments)
   const [date, setDate] = useState("")
@@ -34,31 +37,40 @@ export default function RinMemberDetails({ params }) {
 
   const handleSaveTransaction = async (e) => {
     e.preventDefault()
-    if (!date || !joma) return alert("তারিখ ও আদায়ের পরিমাণ দিন!")
+    if (!date || !joma) return alert("তারিখ ও আদায়ের পরিমাণ দিন!")
 
-    if (editingTx) {
-      await fetch(`/api/rin/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "edit",
-          transactionId: editingTx._id,
-          date,
-          joma,
-          comments,
-        }),
-      })
-    } else {
-      await fetch(`/api/rin/${id}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date, joma, comments }),
-      })
+    setIsSaving(true) // Loading ON
+
+    try {
+      if (editingTx) {
+        await fetch(`/api/rin/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "edit",
+            transactionId: editingTx._id,
+            date,
+            joma,
+            comments,
+          }),
+        })
+      } else {
+        await fetch(`/api/rin/${id}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ date, joma, comments }),
+        })
+      }
+
+      await fetchMemberDetails()
+      resetForm()
+      setShowpopup(false)
+    } catch (error) {
+      console.error(error)
+      alert("সংরক্ষণে সমস্যা হয়েছে! আবার চেষ্টা করুন।")
+    } finally {
+      setIsSaving(false) // Loading OFF
     }
-
-    resetForm()
-    setShowpopup(false)
-    fetchMemberDetails()
   }
 
   const handleDeleteTransaction = async (transactionId) => {
@@ -185,6 +197,7 @@ export default function RinMemberDetails({ params }) {
               onChange={(e) => setDate(e.target.value)}
               placeholder="তারিখ (যেমন: 08/08/2026) *"
               className="bg-slate-900 border border-slate-700 w-full p-2.5 rounded-xl text-sm outline-none focus:border-amber-400"
+              disabled={isSaving}
             />
             <input
               type="number"
@@ -192,6 +205,7 @@ export default function RinMemberDetails({ params }) {
               onChange={(e) => setJoma(e.target.value)}
               placeholder="আদায়ের পরিমাণ (৳) *"
               className="bg-slate-900 border border-slate-700 w-full p-2.5 rounded-xl text-sm outline-none focus:border-amber-400"
+              disabled={isSaving}
             />
             <input
               type="text"
@@ -199,13 +213,22 @@ export default function RinMemberDetails({ params }) {
               onChange={(e) => setComments(e.target.value)}
               placeholder="মন্তব্য (ঐচ্ছিক)"
               className="bg-slate-900 border border-slate-700 w-full p-2.5 rounded-xl text-sm outline-none focus:border-amber-400"
+              disabled={isSaving}
             />
 
             <div className="flex justify-between font-bold pt-2">
-              <button onClick={handleSaveTransaction} className="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-xl text-sm">
-                SAVE
+              <button 
+                onClick={handleSaveTransaction} 
+                disabled={isSaving}
+                className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2 rounded-xl text-sm flex items-center gap-2 transition"
+              >
+                {isSaving ? "SAVING..." : "SAVE"}
               </button>
-              <button onClick={() => setShowpopup(false)} className="bg-gray-600 hover:bg-gray-500 text-white px-5 py-2 rounded-xl text-sm">
+              <button 
+                onClick={() => !isSaving && setShowpopup(false)} 
+                disabled={isSaving}
+                className="bg-gray-600 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2 rounded-xl text-sm transition"
+              >
                 CANCEL
               </button>
             </div>

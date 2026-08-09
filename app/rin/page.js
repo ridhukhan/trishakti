@@ -195,7 +195,7 @@ export default function RinPage() {
       {/* Grand Total Oboshishto Banner */}
       <div className="text-center my-6 px-4 max-w-md mx-auto">
         <div className="w-full bg-gradient-to-r from-amber-400 to-yellow-500 text-black py-3 rounded-2xl shadow-xl font-extrabold text-xl border-2 border-yellow-300">
-          সর্বমোট অবশিষ্ট: ৳ {grandOboshishto}
+          সর্বমোট অবশিষ্ট ঋণ : ৳ {grandOboshishto}
         </div>
       </div>
 
