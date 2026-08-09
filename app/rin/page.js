@@ -151,8 +151,7 @@ export default function RinPage() {
 
                   <div className="grid grid-cols-2 gap-2 text-xs bg-slate-900/60 p-2.5 rounded-xl text-gray-300 my-2">
                     <p>আসল ঋণ: <span className="font-bold text-white">৳{item.ashol}</span></p>
-                    <p>লাভ (ঐচ্ছিক): <span className="font-bold text-emerald-400">৳{item.lab || 0}</span></p>
-                    <p>অবশিষ্ট ঋণ: <span className="font-bold text-red-400">৳{oboshishto}</span></p>
+                    <p>লাভ : <span className="font-bold text-emerald-400">৳{item.lab || 0}</span></p>
                     <p>📅 তারিখ: <span className="text-white">{item.date}</span></p>
                     <p className="col-span-2">মোবাইল: <span className="text-white">{item.phone || "N/A"}</span></p>
                     <p className="col-span-2 whitespace-pre-line border-t border-slate-800 pt-1.5 mt-1">
@@ -252,7 +251,7 @@ export default function RinPage() {
                 className="bg-slate-900 border border-slate-700 w-full p-2.5 rounded-xl text-sm outline-none focus:border-amber-400"
               />
             </div>
-            <input
+            <textarea
               type="text"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
