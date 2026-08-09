@@ -246,7 +246,7 @@ export default function RinPage() {
                 className="border w-full p-2 rounded text-sm"
               />
             </div>
-            <input
+            <textarea
               type="text"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
