@@ -128,7 +128,7 @@ export default function RinMemberDetails({ params }) {
             <div>
               <p className="text-xs text-gray-800">{item.date}</p>
               <div className="flex gap-3 text-sm mt-1">
-                <span className="text-green-900">আদায়/জমা: ৳{item.joma}</span>
+                <span className="text-green-900">আদায়: ৳{item.joma}</span>
                 {item.comments && <span className="text-black-500">comment: {item.comments}</span>}
               </div>
             </div>
