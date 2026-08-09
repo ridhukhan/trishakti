@@ -114,48 +114,50 @@ export default function RinPage() {
   }, 0)
 
   return (
-    <div className="bg-slate-900 min-h-screen text-white pb-12 relative">
-      {/* Header */}
-      <nav className="bg-emerald-800 py-3.5 px-4 flex justify-between items-center shadow-lg border-b border-emerald-700">
+    <div className="bg-blue-800 min-h-screen text-white pb-10 relative">
+      {/* Header Navigation */}
+      <nav className="bg-red-700 py-3 px-4 flex justify-between items-center shadow-md">
         <div className="w-16"></div>
-        <h1 className="font-bold text-2xl md:text-3xl text-center tracking-wide text-amber-300">ঋণ হিসাব</h1>
+        <h1 className="font-bold text-2xl md:text-3xl text-center">ঋণ হিসাব</h1>
 
         <div>
           {isAdmin ? (
-            <button onClick={handleLogout} className="bg-red-600/80 hover:bg-red-600 text-xs px-3 py-1.5 rounded font-bold transition">
+            <button onClick={handleLogout} className="bg-black/40 text-xs px-3 py-1.5 rounded font-bold hover:bg-black/60">
               LOGOUT
             </button>
           ) : (
-            <button onClick={() => setShowLoginPopup(true)} className="bg-amber-400 text-black text-xs px-3 py-1.5 rounded font-bold hover:bg-amber-300 transition">
+            <button onClick={() => setShowLoginPopup(true)} className="bg-yellow-400 text-black text-xs px-3 py-1.5 rounded font-bold hover:bg-yellow-300">
               LOGIN
             </button>
           )}
         </div>
       </nav>
 
-      {/* Member Cards */}
-      <div className="flex flex-col items-center gap-3.5 px-4 max-w-md mx-auto mt-6">
-        {list.map((item) => {
-          const totalAshol = Number(item.ashol) || 0
-          const totalJoma = item.transactions?.reduce((sum, t) => sum + (Number(t.joma) || 0), 0) || 0
-          const oboshishto = totalAshol - totalJoma
+      {/* Grand Total Banner */}
+      <div className="text-center my-5">
+        <div className="inline-block bg-yellow-400 text-black px-6 py-2.5 rounded-2xl shadow-xl font-bold text-xl border-2 border-yellow-500">
+          সর্বমোট অবশিষ্ট ঋণ: ৳ {grandOboshishto}
+        </div>
+      </div>
 
+      {/* Member List */}
+      <div className="flex flex-col items-center gap-3 px-4">
+        {list.map((item) => {
           return (
-            <div key={item._id} className="w-full flex items-center gap-2">
+            <div key={item._id} className="w-full max-w-sm flex items-center gap-2">
               <Link href={`/rin/${item._id}`} className="flex-1">
-                <div className="bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-white p-4 rounded-2xl shadow-lg transition">
-                  {/* Name Centered & Prominent */}
-                  <div className="text-center mb-3">
-                    <h1 className="font-bold text-xl text-amber-400 tracking-wide">{item.name}</h1>
+                <div className="bg-amber-500 text-black p-3.5 rounded-2xl shadow-lg hover:bg-amber-400 transition">
+                  <div className="text-center mb-2 border-b border-black/10 pb-1">
+                    <h1 className="font-bold text-lg">{item.name}</h1>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 text-xs bg-slate-900/60 p-2.5 rounded-xl text-gray-300 my-2">
-                    <p>আসল ঋণ: <span className="font-bold text-white">৳{item.ashol}</span></p>
-                    <p>লাভ : <span className="font-bold text-emerald-400">৳{item.lab || 0}</span></p>
-                    <p>📅 তারিখ: <span className="text-white">{item.date}</span></p>
-                    <p className="col-span-2">মোবাইল: <span className="text-white">{item.phone || "N/A"}</span></p>
-                    <p className="col-span-2 whitespace-pre-line border-t border-slate-800 pt-1.5 mt-1">
-                      ঠিকানা: <span className="text-white">{item.adress}</span>
+                  <div className="grid grid-cols-2 gap-1 text-xs text-gray-900 font-semibold">
+                    <p>আসল: <span className="font-bold">৳{item.ashol}</span></p>
+                    <p>লাভ: <span className="font-bold text-green-900">৳{item.lab || 0}</span></p>
+                    <p> তারিখ: {item.date}</p>
+                    <p>মোবাইল: {item.phone || "N/A"}</p>
+                    <p className="col-span-2 text-gray-800 border-t border-black/10 pt-1 mt-1">
+                      ঠিকানা: {item.adress}
                     </p>
                   </div>
                 </div>
@@ -163,7 +165,7 @@ export default function RinPage() {
 
               {/* Admin Actions */}
               {isAdmin && (
-                <div className="flex flex-col gap-1.5">
+                <div className="flex gap-1">
                   <button
                     onClick={() => {
                       setEditMember(item)
@@ -175,13 +177,13 @@ export default function RinPage() {
                       setDate(item.date)
                       setShowAddPopup(true)
                     }}
-                    className="bg-blue-600 hover:bg-blue-500 text-white text-xs p-2.5 rounded-xl font-bold"
+                    className="bg-blue-600 text-white text-xs px-2.5 py-3 rounded-xl font-bold hover:bg-blue-700"
                   >
                     ✏️
                   </button>
                   <button
                     onClick={() => handleDeleteMember(item._id)}
-                    className="bg-red-600 hover:bg-red-500 text-white text-xs p-2.5 rounded-xl font-bold"
+                    className="bg-red-600 text-white text-xs px-2.5 py-3 rounded-xl font-bold hover:bg-red-700"
                   >
                     🗑️
                   </button>
@@ -192,22 +194,15 @@ export default function RinPage() {
         })}
       </div>
 
-      {/* Grand Total Oboshishto Banner */}
-      <div className="text-center my-6 px-4 max-w-md mx-auto">
-        <div className="w-full bg-gradient-to-r from-amber-400 to-yellow-500 text-black py-3 rounded-2xl shadow-xl font-extrabold text-xl border-2 border-yellow-300">
-          সর্বমোট অবশিষ্ট ঋণ : ৳ {grandOboshishto}
-        </div>
-      </div>
-
-      {/* Floating Add Button */}
+      {/* Add Button (Admin Only) */}
       {isAdmin && (
-        <div className="text-center mt-4">
+        <div className="text-center text-4xl font-bold text-red-500 mt-6">
           <button
             onClick={() => {
               resetForm()
               setShowAddPopup(true)
             }}
-            className="bg-emerald-500 hover:bg-emerald-400 text-black text-3xl font-extrabold w-14 h-14 rounded-full shadow-2xl transition"
+            className="bg-white text-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-gray-100"
           >
             +
           </button>
@@ -216,63 +211,61 @@ export default function RinPage() {
 
       {/* Add/Edit Popup */}
       {showAddPopup && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-800 text-white border border-slate-700 p-6 rounded-2xl w-85 shadow-2xl space-y-3">
-            <h2 className="text-xl font-bold text-center text-amber-400">
-              {editMember ? "ঋণ গ্রহীতা এডিট" : "নতুন ঋণ এন্ট্রি"}
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white text-black p-5 rounded-lg w-80 shadow-2xl">
+            <h2 className="text-xl font-bold mb-4 text-center">
+              {editMember ? "EDIT MEMBER" : "NEW ENTRY"}
             </h2>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="গ্রহীতার নাম *"
-              className="bg-slate-900 border border-slate-700 w-full p-2.5 rounded-xl text-sm outline-none focus:border-amber-400"
+              className="border w-full p-2 mb-3 rounded text-sm"
             />
             <input
               type="text"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              placeholder="ঋণ দেওয়ার তারিখ (যেমন: 08/08/2026) *"
-              className="bg-slate-900 border border-slate-700 w-full p-2.5 rounded-xl text-sm outline-none focus:border-amber-400"
+              placeholder="তারিখ (যেমন: 08/08/2026) *"
+              className="border w-full p-2 mb-3 rounded text-sm"
             />
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2 mb-3">
               <input
                 type="number"
                 value={ashol}
                 onChange={(e) => setAshol(e.target.value)}
                 placeholder="আসল টাকা *"
-                className="bg-slate-900 border border-slate-700 w-full p-2.5 rounded-xl text-sm outline-none focus:border-amber-400"
+                className="border w-full p-2 rounded text-sm"
               />
               <input
                 type="number"
                 value={lab}
                 onChange={(e) => setLab(e.target.value)}
-                placeholder="লাভ / মুনাফা (Optional)"
-                className="bg-slate-900 border border-slate-700 w-full p-2.5 rounded-xl text-sm outline-none focus:border-amber-400"
+                placeholder="লাভ (Optional)"
+                className="border w-full p-2 rounded text-sm"
               />
             </div>
-            <textarea
+            <input
               type="text"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="মোবাইল নম্বর"
-              className="bg-slate-900 border border-slate-700 w-full p-2.5 rounded-xl text-sm outline-none focus:border-amber-400"
+              className="border w-full p-2 mb-3 rounded text-sm"
             />
-            
-            {/* Address Textarea */}
             <textarea
               value={adress}
               onChange={(e) => setAdress(e.target.value)}
               placeholder="ঠিকানা *"
-              rows={3}
-              className="bg-slate-900 border border-slate-700 w-full p-2.5 rounded-xl text-sm outline-none focus:border-amber-400 resize-none"
+              rows={2}
+              className="border w-full p-2 mb-4 rounded text-sm resize-none"
             />
 
-            <div className="flex justify-between font-bold pt-2">
-              <button onClick={handleSaveMember} className="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-xl text-sm">
+            <div className="flex justify-between font-bold">
+              <button onClick={handleSaveMember} className="bg-green-600 text-white px-4 py-2 rounded">
                 SAVE
               </button>
-              <button onClick={() => setShowAddPopup(false)} className="bg-gray-600 hover:bg-gray-500 text-white px-5 py-2 rounded-xl text-sm">
+              <button onClick={() => setShowAddPopup(false)} className="bg-gray-500 text-white px-4 py-2 rounded">
                 CANCEL
               </button>
             </div>
@@ -282,23 +275,23 @@ export default function RinPage() {
 
       {/* Login Popup */}
       {showLoginPopup && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-800 text-white p-6 rounded-2xl w-80 shadow-2xl border border-slate-700">
-            <h2 className="text-xl font-bold mb-2 text-center text-amber-400">ADMIN LOGIN</h2>
-            <p className="text-xs text-gray-400 mb-4 text-center">৮ অক্ষরের সিক্রেট পিন টাইপ করুন</p>
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4">
+          <div className="bg-white text-black p-5 rounded-lg w-80 shadow-2xl">
+            <h2 className="text-xl font-bold mb-3 text-center">ADMIN LOGIN</h2>
+            <p className="text-xs text-gray-600 mb-3 text-center">৮ অক্ষরের পাসওয়ার্ড পিন টাইপ করুন</p>
             <input
               type="password"
               maxLength={8}
               value={pinInput}
               onChange={(e) => setPinInput(e.target.value)}
-              placeholder="8 Digit Code"
-              className="bg-slate-900 border border-slate-700 text-center tracking-widest text-lg w-full p-2.5 mb-5 rounded-xl font-mono outline-none focus:border-amber-400"
+              placeholder="Enter 8 digit code"
+              className="border text-center tracking-widest text-lg w-full p-2 mb-4 rounded font-mono"
             />
             <div className="flex justify-between font-bold">
-              <button onClick={handleLogin} className="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-xl text-sm">
+              <button onClick={handleLogin} className="bg-blue-600 text-white px-4 py-2 rounded">
                 LOGIN
               </button>
-              <button onClick={() => setShowLoginPopup(false)} className="bg-gray-600 hover:bg-gray-500 text-white px-5 py-2 rounded-xl text-sm">
+              <button onClick={() => setShowLoginPopup(false)} className="bg-gray-500 text-white px-4 py-2 rounded">
                 CANCEL
               </button>
             </div>
