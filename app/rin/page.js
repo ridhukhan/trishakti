@@ -106,11 +106,11 @@ export default function RinPage() {
     setEditMember(null)
   }
 
-  // Calculate Grand Remaining / Oboshishto
+  // Calculate Grand Remaining (Only Asol - Total Joma)
   const grandOboshishto = list.reduce((acc, item) => {
-    const totalPayable = (Number(item.ashol) || 0) + (Number(item.lab) || 0)
+    const totalAshol = Number(item.ashol) || 0
     const totalJoma = item.transactions?.reduce((sum, t) => sum + (Number(t.joma) || 0), 0) || 0
-    return acc + (totalPayable - totalJoma)
+    return acc + (totalAshol - totalJoma)
   }, 0)
 
   return (
@@ -136,33 +136,26 @@ export default function RinPage() {
       {/* Member Cards */}
       <div className="flex flex-col items-center gap-3.5 px-4 max-w-md mx-auto mt-6">
         {list.map((item) => {
-          const totalPayable = (Number(item.ashol) || 0) + (Number(item.lab) || 0)
+          const totalAshol = Number(item.ashol) || 0
           const totalJoma = item.transactions?.reduce((sum, t) => sum + (Number(t.joma) || 0), 0) || 0
-          const oboshishto = totalPayable - totalJoma
+          const oboshishto = totalAshol - totalJoma
 
           return (
             <div key={item._id} className="w-full flex items-center gap-2">
               <Link href={`/rin/${item._id}`} className="flex-1">
                 <div className="bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-white p-4 rounded-2xl shadow-lg transition">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h1 className="font-bold text-lg text-amber-400">{item.name}</h1>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-xs bg-red-950 text-red-300 border border-red-800 px-2.5 py-1 rounded-full font-bold">
-                        অবশিষ্ট: ৳ {oboshishto}
-                      </span>
-                    </div>
+                  {/* Name Centered & Prominent */}
+                  <div className="text-center mb-3">
+                    <h1 className="font-bold text-xl text-amber-400 tracking-wide">{item.name}</h1>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 text-xs bg-slate-900/60 p-2.5 rounded-xl text-gray-300 my-2">
-                    <p>আসল: <span className="font-bold text-white">৳{item.ashol}</span></p>
-                    <p>লাভ: <span className="font-bold text-emerald-400">৳{item.lab}</span></p>
-                      <p className="text-xs text-gray-400">📅 তারিখ: {item.date}</p>
-
-                    <p>মোবাইল: <span className="text-white">{item.phone || "N/A"}</span></p>
-
-                    <p className="col-span-2 whitespace-pre-line">
+                    <p>আসল ঋণ: <span className="font-bold text-white">৳{item.ashol}</span></p>
+                    <p>লাভ (ঐচ্ছিক): <span className="font-bold text-emerald-400">৳{item.lab || 0}</span></p>
+                    <p>অবশিষ্ট ঋণ: <span className="font-bold text-red-400">৳{oboshishto}</span></p>
+                    <p>📅 তারিখ: <span className="text-white">{item.date}</span></p>
+                    <p className="col-span-2">মোবাইল: <span className="text-white">{item.phone || "N/A"}</span></p>
+                    <p className="col-span-2 whitespace-pre-line border-t border-slate-800 pt-1.5 mt-1">
                       ঠিকানা: <span className="text-white">{item.adress}</span>
                     </p>
                   </div>
@@ -179,7 +172,7 @@ export default function RinPage() {
                       setAdress(item.adress)
                       setPhone(item.phone || "")
                       setAshol(item.ashol)
-                      setLab(item.lab)
+                      setLab(item.lab || "")
                       setDate(item.date)
                       setShowAddPopup(true)
                     }}
@@ -200,7 +193,7 @@ export default function RinPage() {
         })}
       </div>
 
-      {/* Grand Total Oboshishto Banner (Placed below all members) */}
+      {/* Grand Total Oboshishto Banner */}
       <div className="text-center my-6 px-4 max-w-md mx-auto">
         <div className="w-full bg-gradient-to-r from-amber-400 to-yellow-500 text-black py-3 rounded-2xl shadow-xl font-extrabold text-xl border-2 border-yellow-300">
           সর্বমোট অবশিষ্ট: ৳ {grandOboshishto}
@@ -255,11 +248,12 @@ export default function RinPage() {
                 type="number"
                 value={lab}
                 onChange={(e) => setLab(e.target.value)}
-                placeholder="লাভ / মুনাফা"
+                placeholder="লাভ / মুনাফা (Optional)"
                 className="bg-slate-900 border border-slate-700 w-full p-2.5 rounded-xl text-sm outline-none focus:border-amber-400"
               />
             </div>
-            <textarea
+            <input
+              type="text"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="মোবাইল নম্বর"
