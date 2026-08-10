@@ -76,6 +76,32 @@ export default function Home() {
               </p>
             </div>
           </Link>
+          <Link href="/shonchoi2" className="group">
+            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 text-center shadow-xl hover:border-emerald-500 hover:scale-105 transition-all duration-300">
+              <div className="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                <span className="text-3xl">💰</span>
+              </div>
+              <h3 className="text-2xl font-bold text-emerald-400 mb-2">
+                সঞ্চয় হিসাব 2
+              </h3>
+              <p className="text-slate-400 text-sm">
+                সকল সদস্যের সঞ্চয়, জমা ও উত্তোলনের সম্পূর্ণ হিসাব দেখুন
+              </p>
+            </div>
+          </Link>
+           <Link href="/shonchoi3" className="group">
+            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 text-center shadow-xl hover:border-emerald-500 hover:scale-105 transition-all duration-300">
+              <div className="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                <span className="text-3xl">💰</span>
+              </div>
+              <h3 className="text-2xl font-bold text-emerald-400 mb-2">
+                সঞ্চয় হিসাব 3
+              </h3>
+              <p className="text-slate-400 text-sm">
+                সকল সদস্যের সঞ্চয়, জমা ও উত্তোলনের সম্পূর্ণ হিসাব দেখুন
+              </p>
+            </div>
+          </Link>
         </div>
       </main>
 
