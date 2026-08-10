@@ -87,6 +87,11 @@ export default function MemberDetails({ params }) {
   return (
     <div className="bg-blue-800 min-h-screen text-white p-4">
       {/* Header */}
+      <div className="max-w-md mx-auto mb-3">
+        <Link href="/shonchoi" className="text-xs text-yellow-400 hover:underline inline-block font-semibold">
+          ← ব্যাক টু লিস্ট
+        </Link>
+      </div>
       <nav className="bg-fuchsia-800 p-4 text-center rounded shadow">
         <h1 className="text-2xl font-bold text-yellow-400">{member.name}</h1>
         <p className="text-sm">{member.adress}</p>
