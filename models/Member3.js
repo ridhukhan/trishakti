@@ -18,7 +18,7 @@ const transactionSchema = new mongoose.Schema({
   },
 })
 
-const member3Schema = new mongoose.Schema(
+const Member3Schema = new mongoose.Schema(
   {
     name: {
       type: String,
