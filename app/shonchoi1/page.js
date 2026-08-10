@@ -111,6 +111,11 @@ export default function Shonchoi() {
 
   return (
     <div className="bg-blue-800 min-h-screen text-white pb-10 relative">
+        <div className="max-w-md mx-auto mb-3">
+        <Link href="/" className="text-xs text-yellow-400 hover:underline inline-block font-semibold">
+          ← Back to HOME
+        </Link>
+        </div>
       {/* Header Navigation */}
       <nav className="bg-red-700 py-3 px-4 flex justify-between items-center shadow-md">
         <div className="w-16"></div> {/* Spacer */}
