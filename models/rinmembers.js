@@ -39,6 +39,10 @@ const rinmemberSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    order: {
+      type: Number,
+      default: 0, // 👈 পজিশন ট্র্যাক করার ফিল্ড
+    },
     transactions: [rintransactionSchema],
   },
   { timestamps: true }

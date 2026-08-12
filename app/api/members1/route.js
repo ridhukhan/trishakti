@@ -2,27 +2,31 @@ import { connectDB } from "@/lib/mongodb1"
 import Member from "@/models/members"
 import { NextResponse } from "next/server"
 
+// GET: Order অনুযায়ী সর্ট করে ডাটা লোড করবে
 export async function GET() {
   try {
     await connectDB()
-    const members = await Member.find({})
+    const members = await Member.find({}).sort({ order: 1 })
     return NextResponse.json(members, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
 
+// POST: নতুন মেম্বার যুক্ত করার সময় শেষ order দিয়ে সেভ করবে
 export async function POST(req) {
   try {
-    const { name, adress,phone } = await req.json()
+    const { name, adress, phone } = await req.json()
     await connectDB()
-    const newMember = await Member.create({ name, adress,phone })
+    const count = await Member.countDocuments()
+    const newMember = await Member.create({ name, adress, phone, order: count })
     return NextResponse.json(newMember, { status: 201 })
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
 
+// PUT: সাধারণ এডিট অথবা রিঅর্ডার লজিক
 export async function PUT(req) {
   try {
     const body = await req.json()
@@ -46,7 +50,6 @@ export async function PUT(req) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
-
 
 export async function DELETE(req) {
   try {

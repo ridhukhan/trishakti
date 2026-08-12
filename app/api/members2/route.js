@@ -1,31 +1,32 @@
 import { connectDB } from "@/lib/mongodb1"
-import Member2 from "@/models/Member2"
+import Member2 from "@/models/members"
 import { NextResponse } from "next/server"
 
-// সব মেম্বার এর ডাটা পাওয়ার জন্য
+// GET: Order অনুযায়ী সর্ট করে ডাটা লোড করবে
 export async function GET() {
   try {
     await connectDB()
-    const members = await Member2.find({})
+    const members = await Member2.find({}).sort({ order: 1 })
     return NextResponse.json(members, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
 
-// নতুন মেম্বার যুক্ত করার জন্য
+// POST: নতুন মেম্বার যুক্ত করার সময় শেষ order দিয়ে সেভ করবে
 export async function POST(req) {
   try {
     const { name, adress, phone } = await req.json()
     await connectDB()
-    const newMember = await Member2.create({ name, adress, phone })
+    const count = await Member2.countDocuments()
+    const newMember = await Member2.create({ name, adress, phone, order: count })
     return NextResponse.json(newMember, { status: 201 })
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
 
-// মেম্বার এর তথ্য (নাম, ঠিকানা, ফোন) আপডেট করার জন্য
+// PUT: সাধারণ এডিট অথবা রিঅর্ডার লজিক
 export async function PUT(req) {
   try {
     const body = await req.json()
@@ -35,7 +36,7 @@ export async function PUT(req) {
     if (body.action === "reorder") {
       const { items } = body
       const updatePromises = items.map((item, index) =>
-        Member.findByIdAndUpdate(item._id, { order: index })
+        Member2.findByIdAndUpdate(item._id, { order: index })
       )
       await Promise.all(updatePromises)
       return NextResponse.json({ message: "Order updated successfully" }, { status: 200 })
@@ -50,8 +51,6 @@ export async function PUT(req) {
   }
 }
 
-
-// মেম্বার রিমুভ/ডিলিট করার জন্য
 export async function DELETE(req) {
   try {
     const { id } = await req.json()
