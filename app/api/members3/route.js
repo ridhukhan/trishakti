@@ -28,18 +28,28 @@ export async function POST(req) {
 // মেম্বার এর তথ্য (নাম, ঠিকানা, ফোন) আপডেট করার জন্য
 export async function PUT(req) {
   try {
-    const { id, name, adress, phone } = await req.json()
+    const body = await req.json()
     await connectDB()
-    const updated = await Member3.findByIdAndUpdate(
-      id,
-      { name, adress, phone },
-      { new: true }
-    )
+
+    // 🔹 Drag & Drop এর সময় সিরিয়াল ডাটাবেজে আপডেট করা
+    if (body.action === "reorder") {
+      const { items } = body
+      const updatePromises = items.map((item, index) =>
+        Member.findByIdAndUpdate(item._id, { order: index })
+      )
+      await Promise.all(updatePromises)
+      return NextResponse.json({ message: "Order updated successfully" }, { status: 200 })
+    }
+
+    // 🔹 সাধারণ মেম্বার এডিট (নাম, ঠিকানা, ফোন)
+    const { id, name, adress, phone } = body
+    const updated = await Member3.findByIdAndUpdate(id, { name, adress, phone }, { new: true })
     return NextResponse.json(updated, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
+
 
 // মেম্বার রিমুভ/ডিলিট করার জন্য
 export async function DELETE(req) {

@@ -1,214 +1,318 @@
 "use client"
-import { useState, useEffect, use } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-export default function MemberDetails({ params }) {
-  const { id } = use(params)
-  const [member, setMember] = useState(null)
+import { Reorder } from "framer-motion"
+
+export default function Shonchoi() {
+  const [list, setList] = useState([])
   const [isAdmin, setIsAdmin] = useState(false)
   
-  const [showpopup, setShowpopup] = useState(false)
-  const [editingTx, setEditingTx] = useState(null) 
-  const [date, setDate] = useState("")
-  const [joma, setJoma] = useState("")
-  const [uttolon, setUttolon] = useState("")
-  const [comments,setComments]=useState("")
+  // Modals state
+  const [showAddPopup, setShowAddPopup] = useState(false)
+  const [showLoginPopup, setShowLoginPopup] = useState(false)
+  const [editMember, setEditMember] = useState(null)
+
+  // Form states
+  const [name, setName] = useState("")
+  const [adress, setAdress] = useState("")
+  const [phone, setPhone] = useState("")
+
+  const [pinInput, setPinInput] = useState("")
 
   useEffect(() => {
-    fetchMemberDetails()
+    fetchMembers()
     const adminState = localStorage.getItem("isAdmin")
     if (adminState === "true") setIsAdmin(true)
   }, [])
 
-  const fetchMemberDetails = async () => {
-    const res = await fetch(`/api/members3/${id}`)
-    const data = await res.json()
-    setMember(data)
+  const fetchMembers = async () => {
+    try {
+      const res = await fetch("/api/members3")
+      const data = await res.json()
+      setList(Array.isArray(data) ? data : [])
+    } catch (error) {
+      console.error(error)
+    }
   }
 
-  // Save transaction (New or Edit)
-  const handleSaveTransaction = async (e) => {
+  // Admin Login Handle
+  const handleLogin = async (e) => {
     e.preventDefault()
-    if (!date) return alert("তারিখ দিন!")
+    const res = await fetch("/api/admin/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pin: pinInput }),
+    })
+    const data = await res.json()
 
-    if (editingTx) {
-      // Update transaction
-      await fetch(`/api/members3/${id}`, {
+    if (res.ok && data.success) {
+      setIsAdmin(true)
+      localStorage.setItem("isAdmin", "true")
+      setShowLoginPopup(false)
+      setPinInput("")
+      alert("Admin Login Successful!")
+    } else {
+      alert(data.message || "ভুল পাসওয়ার্ড!")
+    }
+  }
+
+  const handleLogout = () => {
+    setIsAdmin(false)
+    localStorage.removeItem("isAdmin")
+  }
+
+  // 🔹 Drag করে পজিশন চেঞ্জ করার পর ডাটাবেজে নতুন অর্ডার সেভ করা
+  const handleReorder = async (newList) => {
+    setList(newList)
+
+    if (isAdmin) {
+      try {
+        await fetch("/api/members3", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "reorder",
+            items: newList.map((item, index) => ({ _id: item._id, order: index })),
+          }),
+        })
+      } catch (error) {
+        console.error("Failed to update order:", error)
+      }
+    }
+  }
+
+  // Add or Edit Member Save
+  const handleSaveMember = async (e) => {
+    e.preventDefault()
+    if (!name || !adress) return alert("সব তথ্য দিন!")
+
+    if (editMember) {
+      await fetch("/api/members3", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "edit",
-          transactionId: editingTx._id,
-          date,
-          joma,
-          uttolon,
-          comments,
-        }),
+        body: JSON.stringify({ id: editMember._id, name, adress, phone }),
       })
     } else {
-      // Add new transaction
-      await fetch(`/api/members3/${id}`, {
+      await fetch("/api/members3", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date, joma, uttolon ,comments}),
+        body: JSON.stringify({ name, adress, phone }),
       })
     }
 
-    // Reset Form
-    setDate("")
-    setJoma("")
-    setUttolon("")
-    setComments("")
-    setEditingTx(null)
-    setShowpopup(false)
-    fetchMemberDetails()
+    setName("")
+    setAdress("")
+    setPhone("")
+    setEditMember(null)
+    setShowAddPopup(false)
+    fetchMembers()
   }
 
-  // Delete Transaction
-  const handleDeleteTransaction = async (transactionId) => {
-    if (!confirm("আপনি কি নিশ্চিত এই হিসাবটি মুছে ফেলতে চান?")) return
-    await fetch(`/api/members3/${id}`, {
-      method: "PUT",
+  // Member Delete
+  const handleDeleteMember = async (id) => {
+    if (!confirm("আপনি কি নিশ্চিত এই মেম্বারটি মুছে ফেলতে চান?")) return
+    await fetch("/api/members3", {
+      method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "delete",
-        transactionId,
-      }),
+      body: JSON.stringify({ id }),
     })
-    fetchMemberDetails()
+    fetchMembers()
   }
 
-  if (!member) return <div className="text-center mt-10 font-bold text-white">Loading...</div>
-
-  // Total Calculation
-  const totalBalance = member.transactions?.reduce((acc, item) => {
-    return acc + (Number(item.joma) || 0) - (Number(item.uttolon) || 0)
-  }, 0) || 0
+  // Grand Total Calculation
+  const grandTotal = list.reduce((totalAcc, member) => {
+    const memberTotal = member.transactions?.reduce((acc, item) => {
+      return acc + (Number(item.joma) || 0) - (Number(item.uttolon) || 0)
+    }, 0) || 0
+    return totalAcc + memberTotal
+  }, 0)
 
   return (
-    <div className="bg-blue-800 min-h-screen text-white p-4">
-      {/* Header */}
-       <div className="max-w-md mx-auto mb-3">
-        <Link href="/shonchoi3" className="text-xs text-yellow-400 hover:underline inline-block font-semibold">
-          ← ব্যাক টু লিস্ট
+    <div className="bg-blue-800 min-h-screen text-white pb-10 relative">
+      <div className="max-w-md mx-auto mb-3 pt-3 px-4">
+        <Link href="/" className="text-xs text-yellow-400 hover:underline inline-block font-semibold">
+          ← Back to HOME
         </Link>
       </div>
-      <nav className="bg-fuchsia-800 p-4 text-center rounded shadow">
-        <h1 className="text-2xl font-bold text-yellow-400">{member.name}</h1>
-        <p className="text-sm">{member.adress}</p>
-        <p className="text-sm">{member.phone}</p>
 
+      {/* Header Navigation */}
+      <nav className="bg-red-700 py-3 px-4 flex justify-between items-center shadow-md">
+        <div className="w-16"></div>
+        <h1 className="font-bold text-2xl md:text-3xl text-center">সঞ্চয় হিসাব</h1>
+        
+        <div>
+          {isAdmin ? (
+            <button onClick={handleLogout} className="bg-black/40 text-xs px-3 py-1.5 rounded font-bold hover:bg-black/60">
+              LOGOUT
+            </button>
+          ) : (
+            <button onClick={() => setShowLoginPopup(true)} className="bg-yellow-400 text-black text-xs px-3 py-1.5 rounded font-bold hover:bg-yellow-300">
+              LOGIN
+            </button>
+          )}
+        </div>
       </nav>
 
-      {/* Transaction List */}
-      <div className="mt-5 space-y-3 max-w-md mx-auto">
-        {member.transactions?.map((item) => (
-          <div key={item._id} className="bg-amber-500 text-black p-3 rounded-lg flex justify-between items-center font-bold">
-            <div>
-              <p className="text-xs text-gray-800"> {item.date}</p>
-              <div className="flex gap-3 text-sm mt-1">
-                <span className="text-green-900">জমা: ৳{item.joma}</span>
-                <span className="text-red-900">উত্তোলন: ৳{item.uttolon}</span>
-                <span className="text-black-500">comment:-{item.comments}</span>
-
-              </div>
-            </div>
-
-            {/* Edit & Delete for Admin */}
-            {isAdmin && (
-              <div className="flex gap-1">
-                <button
-                  onClick={() => {
-                    setEditingTx(item)
-                    setDate(item.date)
-                    setJoma(item.joma)
-                    setUttolon(item.uttolon)
-                    setComments(item.comments)
-                    setShowpopup(true)
-                  }}
-                  className="bg-blue-600 text-white text-xs px-2 py-1 rounded"
-                >
-                  ✏️
-                </button>
-                <button
-                  onClick={() => handleDeleteTransaction(item._id)}
-                  className="bg-red-600 text-white text-xs px-2 py-1 rounded"
-                >
-                  🗑️
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Total Balance */}
-      <div className="mt-6 text-center">
-        <div className="inline-block bg-yellow-400 text-black text-2xl font-bold px-6 py-2 rounded-full shadow-lg">
-          Total: ৳{totalBalance}
+      {/* Grand Total */}
+      <div className="text-center my-5">
+        <div className="inline-block bg-yellow-400 text-black px-6 py-2.5 rounded-2xl shadow-xl font-bold text-xl border-2 border-yellow-500">
+          সর্বমোট জমা: ৳ {grandTotal}
         </div>
       </div>
 
-      {/* Add Button (Admin Only) */}
+      {/* Reorderable Member List */}
+      <div className="flex flex-col items-center px-4">
+        <Reorder.Group
+          axis="y"
+          values={list}
+          onReorder={handleReorder}
+          className="w-full max-w-sm space-y-3"
+        >
+          {list.map((item) => {
+            const memberBalance = item.transactions?.reduce((acc, t) => {
+              return acc + (Number(t.joma) || 0) - (Number(t.uttolon) || 0)
+            }, 0) || 0
+
+            return (
+              <Reorder.Item
+                key={item._id}
+                value={item}
+                dragListener={isAdmin} // 👈 এডমিন লগইন থাকলে টেনে সরানো যাবে
+                whileDrag={{
+                  scale: 1.03, // চেপে ধরার পর হালকা বড় ও ভাসমান দেখাবে
+                  boxShadow: "0px 10px 25px rgba(0,0,0,0.3)",
+                  zIndex: 50,
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                className="touch-none select-none cursor-grab active:cursor-grabbing"
+              >
+                <div className="flex items-center gap-2 bg-amber-500 text-black p-3.5 rounded-2xl shadow-lg hover:bg-amber-400 transition">
+                  {isAdmin && (
+                    <div className="text-gray-800 font-bold px-1 text-xl opacity-75">
+                      ⋮⋮
+                    </div>
+                  )}
+
+                  <Link href={`/shonchoi3/${item._id}`} className="flex-1">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h1 className="font-bold text-lg">{item.name}</h1>
+                        <p className="text-xs text-gray-800">{item.phone}</p>
+                        <p className="text-xs text-gray-800">{item.adress}</p>
+                      </div>
+                      <div className="bg-amber-600 text-white px-3 py-1 rounded-lg font-bold text-sm">
+                        ৳ {memberBalance}
+                      </div>
+                    </div>
+                  </Link>
+
+                  {/* Edit & Delete Buttons */}
+                  {isAdmin && (
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => {
+                          setEditMember(item)
+                          setName(item.name)
+                          setAdress(item.adress)
+                          setPhone(item.phone || "")
+                          setShowAddPopup(true)
+                        }}
+                        className="bg-blue-600 text-white text-xs px-2.5 py-3 rounded-xl font-bold hover:bg-blue-700"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => handleDeleteMember(item._id)}
+                        className="bg-red-600 text-white text-xs px-2.5 py-3 rounded-xl font-bold hover:bg-red-700"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </Reorder.Item>
+            )
+          })}
+        </Reorder.Group>
+      </div>
+
+      {/* Add Button */}
       {isAdmin && (
-        <div className="text-center text-4xl font-bold text-yellow-400 mt-6">
+        <div className="text-center text-4xl font-bold text-red-500 mt-6">
           <button
             onClick={() => {
-              setEditingTx(null)
-              setDate("")
-              setJoma("")
-              setUttolon("")
-              setComments("")
-              setShowpopup(true)
+              setEditMember(null)
+              setName("")
+              setAdress("")
+              setPhone("")
+              setShowAddPopup(true)
             }}
-            className="bg-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-red-700 text-white"
+            className="bg-white text-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-gray-100"
           >
             +
           </button>
         </div>
       )}
 
-      {/* Add / Edit Transaction Modal */}
-      {showpopup && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4">
+      {/* Add/Edit Modal */}
+      {showAddPopup && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
           <div className="bg-white text-black p-5 rounded-lg w-80 shadow-2xl">
             <h2 className="text-xl font-bold mb-4 text-center">
-              {editingTx ? "হিসাব এডিট করুন" : "নতুন হিসাব যোগ করুন"}
+              {editMember ? "EDIT MEMBER" : "NEW ENTRY"}
             </h2>
-
-            {/* Manual Date Input */}
             <input
               type="text"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              placeholder="তারিখ লিখুন (যেমন: 05/08/2026)"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter name"
               className="border w-full p-2 mb-3 rounded"
             />
             <input
-              type="number"
-              value={joma}
-              onChange={(e) => setJoma(e.target.value)}
-              placeholder="জমা (৳)"
-              className="border w-full p-2 mb-3 rounded"
-            />
-            <input
-              type="number"
-              value={uttolon}
-              onChange={(e) => setUttolon(e.target.value)}
-              placeholder="উত্তোলন (৳)"
+              type="text"
+              value={adress}
+              onChange={(e) => setAdress(e.target.value)}
+              placeholder="Enter address"
               className="border w-full p-2 mb-4 rounded"
             />
-             <input
+            <input
               type="text"
-              value={comments}
-              onChange={(e) => setComments(e.target.value)}
-              placeholder="ENTER COMMENTS"
-              className="border w-full p-2 mb-3 rounded"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="মোবাইল নাম্বার লিখুন"
+              className="border w-full p-2 mb-4 rounded"
             />
             <div className="flex justify-between font-bold">
-              <button onClick={handleSaveTransaction} className="bg-green-600 text-white px-4 py-2 rounded">
+              <button onClick={handleSaveMember} className="bg-green-600 text-white px-4 py-2 rounded">
                 SAVE
               </button>
-              <button onClick={() => setShowpopup(false)} className="bg-gray-500 text-white px-4 py-2 rounded">
+              <button onClick={() => setShowAddPopup(false)} className="bg-gray-500 text-white px-4 py-2 rounded">
+                CANCEL
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Admin Login Modal */}
+      {showLoginPopup && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+          <div className="bg-white text-black p-5 rounded-lg w-80 shadow-2xl">
+            <h2 className="text-xl font-bold mb-3 text-center">ADMIN LOGIN</h2>
+            <p className="text-xs text-gray-600 mb-3 text-center">৮ অক্ষরের পাসওয়ার্ড পিন টাইপ করুন</p>
+            <input
+              type="password"
+              maxLength={8}
+              value={pinInput}
+              onChange={(e) => setPinInput(e.target.value)}
+              placeholder="Enter 8 digit code"
+              className="border text-center tracking-widest text-lg w-full p-2 mb-4 rounded font-mono"
+            />
+            <div className="flex justify-between font-bold">
+              <button onClick={handleLogin} className="bg-blue-600 text-white px-4 py-2 rounded">
+                LOGIN
+              </button>
+              <button onClick={() => setShowLoginPopup(false)} className="bg-gray-500 text-white px-4 py-2 rounded">
                 CANCEL
               </button>
             </div>

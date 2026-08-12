@@ -31,6 +31,10 @@ const Member2Schema = new mongoose.Schema(
     phone:{
        type: String,
     },
+     order: {
+      type: Number,
+      default: 0, // 👈 পজিশন ট্র্যাক করার ফিল্ড
+    },
     transactions: [transactionSchema],
   },
   { timestamps: true }
