@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { Reorder } from "framer-motion"
 
 export default function RinPage() {
   const [list, setList] = useState([])
@@ -36,6 +37,7 @@ export default function RinPage() {
     }
   }
 
+  // Admin Login Handle
   const handleLogin = async (e) => {
     e.preventDefault()
     const res = await fetch("/api/admin/verify", {
@@ -59,6 +61,26 @@ export default function RinPage() {
   const handleLogout = () => {
     setIsAdmin(false)
     localStorage.removeItem("isAdmin")
+  }
+
+  // 🔹 Drag করে পজিশন পরিবর্তন করার পর ডাটাবেজে নতুন অর্ডার সেভ করা
+  const handleReorder = async (newList) => {
+    setList(newList)
+
+    if (isAdmin) {
+      try {
+        await fetch("/api/rin1", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "reorder",
+            items: newList.map((item, index) => ({ _id: item._id, order: index })),
+          }),
+        })
+      } catch (error) {
+        console.error("Failed to update order:", error)
+      }
+    }
   }
 
   const handleSaveMember = async (e) => {
@@ -115,11 +137,12 @@ export default function RinPage() {
 
   return (
     <div className="bg-blue-800 min-h-screen text-white pb-10 relative">
-        <div className="max-w-md mx-auto mb-3">
-                <Link href="/" className="text-xs text-yellow-400 hover:underline inline-block font-semibold">
-                  ← Back to HOME
-                </Link>
-                </div>
+      <div className="max-w-md mx-auto mb-3 pt-3 px-4">
+        <Link href="/" className="text-xs text-yellow-400 hover:underline inline-block font-semibold">
+          ← Back to HOME
+        </Link>
+      </div>
+
       {/* Header Navigation */}
       <nav className="bg-red-700 py-3 px-4 flex justify-between items-center shadow-md">
         <div className="w-16"></div>
@@ -145,58 +168,84 @@ export default function RinPage() {
         </div>
       </div>
 
-      {/* Member List */}
-      <div className="flex flex-col items-center gap-3 px-4">
-        {list.map((item) => {
-          return (
-            <div key={item._id} className="w-full max-w-sm flex items-center gap-2">
-              <Link href={`/rin1/${item._id}`} className="flex-1">
-                <div className="bg-amber-500 text-black p-3.5 rounded-2xl shadow-lg hover:bg-amber-400 transition">
-                  <div className="text-center mb-2 border-b border-black/10 pb-1">
-                    <h1 className="font-bold text-lg">{item.name}</h1>
-                  </div>
+      {/* Reorderable Member List */}
+      <div className="flex flex-col items-center px-4">
+        <Reorder.Group
+          axis="y"
+          values={list}
+          onReorder={handleReorder}
+          className="w-full max-w-sm space-y-3"
+        >
+          {list.map((item) => {
+            return (
+              <Reorder.Item
+                key={item._id}
+                value={item}
+                dragListener={isAdmin} // এডমিন লগইন থাকলেই কেবল ড্রাগ করা যাবে
+                whileDrag={{
+                  scale: 1.03,
+                  boxShadow: "0px 10px 25px rgba(0,0,0,0.3)",
+                  zIndex: 50,
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                className="touch-none select-none cursor-grab active:cursor-grabbing"
+              >
+                <div className="flex items-center gap-2 bg-amber-500 text-black p-3.5 rounded-2xl shadow-lg hover:bg-amber-400 transition">
+                  {isAdmin && (
+                    <div className="text-gray-800 font-bold px-1 text-xl opacity-75">
+                      ⋮⋮
+                    </div>
+                  )}
 
-                  <div className="grid grid-cols-2 gap-1 text-xs text-gray-900 font-semibold">
-                    <p>আসল: <span className="font-bold">৳{item.ashol}</span></p>
-                    <p>লাভ: <span className="font-bold text-green-900">৳{item.lab || 0}</span></p>
-                    <p> তারিখ: {item.date}</p>
-                    <p>মোবাইল: {item.phone || "N/A"}</p>
-                    <p className="col-span-2 text-gray-800 border-t border-black/10 pt-1 mt-1">
-                      ঠিকানা: {item.adress}
-                    </p>
-                  </div>
-                </div>
-              </Link>
+                  <Link href={`/rin1/${item._id}`} className="flex-1">
+                    <div>
+                      <div className="text-center mb-2 border-b border-black/10 pb-1">
+                        <h1 className="font-bold text-lg">{item.name}</h1>
+                      </div>
 
-              {/* Admin Actions */}
-              {isAdmin && (
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => {
-                      setEditMember(item)
-                      setName(item.name)
-                      setAdress(item.adress)
-                      setPhone(item.phone || "")
-                      setAshol(item.ashol)
-                      setLab(item.lab || "")
-                      setDate(item.date)
-                      setShowAddPopup(true)
-                    }}
-                    className="bg-blue-600 text-white text-xs px-2.5 py-3 rounded-xl font-bold hover:bg-blue-700"
-                  >
-                    ✏️
-                  </button>
-                  <button
-                    onClick={() => handleDeleteMember(item._id)}
-                    className="bg-red-600 text-white text-xs px-2.5 py-3 rounded-xl font-bold hover:bg-red-700"
-                  >
-                    🗑️
-                  </button>
+                      <div className="grid grid-cols-2 gap-1 text-xs text-gray-900 font-semibold">
+                        <p>আসল: <span className="font-bold">৳{item.ashol}</span></p>
+                        <p>লাভ: <span className="font-bold text-green-900">৳{item.lab || 0}</span></p>
+                        <p>তারিখ: {item.date}</p>
+                        <p>মোবাইল: {item.phone || "N/A"}</p>
+                        <p className="col-span-2 text-gray-800 border-t border-black/10 pt-1 mt-1">
+                          ঠিকানা: {item.adress}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+
+                  {/* Admin Actions */}
+                  {isAdmin && (
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => {
+                          setEditMember(item)
+                          setName(item.name)
+                          setAdress(item.adress)
+                          setPhone(item.phone || "")
+                          setAshol(item.ashol)
+                          setLab(item.lab || "")
+                          setDate(item.date)
+                          setShowAddPopup(true)
+                        }}
+                        className="bg-blue-600 text-white text-xs px-2.5 py-3 rounded-xl font-bold hover:bg-blue-700"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => handleDeleteMember(item._id)}
+                        className="bg-red-600 text-white text-xs px-2.5 py-3 rounded-xl font-bold hover:bg-red-700"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          )
-        })}
+              </Reorder.Item>
+            )
+          })}
+        </Reorder.Group>
       </div>
 
       {/* Add Button (Admin Only) */}
@@ -216,7 +265,7 @@ export default function RinPage() {
 
       {/* Add/Edit Popup */}
       {showAddPopup && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
           <div className="bg-white text-black p-5 rounded-lg w-80 shadow-2xl">
             <h2 className="text-xl font-bold mb-4 text-center">
               {editMember ? "EDIT MEMBER" : "NEW ENTRY"}
@@ -252,11 +301,10 @@ export default function RinPage() {
               />
             </div>
             <textarea
-              type="text"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="মোবাইল নম্বর"
-              className="border w-full p-2 mb-3 rounded text-sm"
+              className="border w-full p-2 mb-3 rounded text-sm resize-none"
             />
             <textarea
               value={adress}
@@ -280,7 +328,7 @@ export default function RinPage() {
 
       {/* Login Popup */}
       {showLoginPopup && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
           <div className="bg-white text-black p-5 rounded-lg w-80 shadow-2xl">
             <h2 className="text-xl font-bold mb-3 text-center">ADMIN LOGIN</h2>
             <p className="text-xs text-gray-600 mb-3 text-center">৮ অক্ষরের পাসওয়ার্ড পিন টাইপ করুন</p>

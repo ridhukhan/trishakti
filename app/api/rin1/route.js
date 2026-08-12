@@ -5,7 +5,8 @@ import { NextResponse } from "next/server"
 export async function GET() {
   try {
     await connectDB()
-    const members = await Rinmember.find({}).sort({ createdAt: -1 })
+    // order ফিল্ড অনুযায়ী সর্ট হবে
+    const members = await Rinmember.find({}).sort({ order: 1, createdAt: -1 })
     return NextResponse.json(members, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
@@ -32,8 +33,21 @@ export async function POST(req) {
 
 export async function PUT(req) {
   try {
-    const { id, name, adress, phone, ashol, lab, date } = await req.json()
+    const body = await req.json()
     await connectDB()
+
+    // 🔹 Drag & Drop Reorder হ্যান্ডেল করার জন্য
+    if (body.action === "reorder") {
+      const { items } = body
+      const updatePromises = items.map((item) =>
+        Rinmember.findByIdAndUpdate(item._id, { order: item.order })
+      )
+      await Promise.all(updatePromises)
+      return NextResponse.json({ message: "Order updated successfully" }, { status: 200 })
+    }
+
+    // 🔹 সাধারণ Edit/Update হ্যান্ডেল করার জন্য
+    const { id, name, adress, phone, ashol, lab, date } = body
     const updated = await Rinmember.findByIdAndUpdate(
       id,
       { name, adress, phone, ashol: Number(ashol) || 0, lab: Number(lab) || 0, date },
