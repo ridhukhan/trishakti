@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { Reorder } from "framer-motion"
 
 export default function Shonchoi() {
   const [list, setList] = useState([])
@@ -9,7 +10,7 @@ export default function Shonchoi() {
   // Modals state
   const [showAddPopup, setShowAddPopup] = useState(false)
   const [showLoginPopup, setShowLoginPopup] = useState(false)
-  const [editMember, setEditMember] = useState(null) // Edit-এর জন্য মেম্বার অবজেক্ট
+  const [editMember, setEditMember] = useState(null)
 
   // Form states
   const [name, setName] = useState("")
@@ -20,7 +21,6 @@ export default function Shonchoi() {
 
   useEffect(() => {
     fetchMembers()
-    // LocalStorage থেকে Admin স্ট্যাটাস চেক
     const adminState = localStorage.getItem("isAdmin")
     if (adminState === "true") setIsAdmin(true)
   }, [])
@@ -61,24 +61,42 @@ export default function Shonchoi() {
     localStorage.removeItem("isAdmin")
   }
 
+  // 🔹 Drag করে পজিশন চেঞ্জ করার পর ডাটাবেজে নতুন অর্ডার সেভ করা
+  const handleReorder = async (newList) => {
+    setList(newList)
+
+    if (isAdmin) {
+      try {
+        await fetch("/api/members", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "reorder",
+            items: newList.map((item, index) => ({ _id: item._id, order: index })),
+          }),
+        })
+      } catch (error) {
+        console.error("Failed to update order:", error)
+      }
+    }
+  }
+
   // Add or Edit Member Save
   const handleSaveMember = async (e) => {
     e.preventDefault()
     if (!name || !adress) return alert("সব তথ্য দিন!")
 
     if (editMember) {
-      // Edit mode
       await fetch("/api/members", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: editMember._id, name, adress,phone }),
+        body: JSON.stringify({ id: editMember._id, name, adress, phone }),
       })
     } else {
-      // Add mode
       await fetch("/api/members", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, adress ,phone}),
+        body: JSON.stringify({ name, adress, phone }),
       })
     }
 
@@ -111,17 +129,17 @@ export default function Shonchoi() {
 
   return (
     <div className="bg-blue-800 min-h-screen text-white pb-10 relative">
-       <div className="max-w-md mx-auto mb-3">
+      <div className="max-w-md mx-auto mb-3 pt-3 px-4">
         <Link href="/" className="text-xs text-yellow-400 hover:underline inline-block font-semibold">
           ← Back to HOME
         </Link>
-        </div>
+      </div>
+
       {/* Header Navigation */}
       <nav className="bg-red-700 py-3 px-4 flex justify-between items-center shadow-md">
-        <div className="w-16"></div> {/* Spacer */}
+        <div className="w-16"></div>
         <h1 className="font-bold text-2xl md:text-3xl text-center">সঞ্চয় হিসাব</h1>
         
-        {/* Admin Login/Logout Button */}
         <div>
           {isAdmin ? (
             <button onClick={handleLogout} className="bg-black/40 text-xs px-3 py-1.5 rounded font-bold hover:bg-black/60">
@@ -142,58 +160,83 @@ export default function Shonchoi() {
         </div>
       </div>
 
-      {/* Member List */}
-      <div className="flex flex-col items-center gap-3 px-4">
-        {list.map((item) => {
-          const memberBalance = item.transactions?.reduce((acc, t) => {
-            return acc + (Number(t.joma) || 0) - (Number(t.uttolon) || 0)
-          }, 0) || 0
+      {/* Reorderable Member List */}
+      <div className="flex flex-col items-center px-4">
+        <Reorder.Group
+          axis="y"
+          values={list}
+          onReorder={handleReorder}
+          className="w-full max-w-sm space-y-3"
+        >
+          {list.map((item) => {
+            const memberBalance = item.transactions?.reduce((acc, t) => {
+              return acc + (Number(t.joma) || 0) - (Number(t.uttolon) || 0)
+            }, 0) || 0
 
-          return (
-            <div key={item._id} className="w-full max-w-sm flex items-center gap-2">
-              <Link href={`/shonchoi/${item._id}`} className="flex-1">
-                <div className="flex justify-between items-center bg-amber-500 text-black p-3.5 rounded-2xl shadow-lg hover:bg-amber-400 transition">
-                  <div>
-                    <h1 className="font-bold text-lg">{item.name}</h1>
-                     <p className="text-xs text-gray-800">{item.phone}</p>
-                    <p className="text-xs text-gray-800">{item.adress}</p>
-                  </div>
-                  <div className="bg-amber-600 text-white px-3 py-1 rounded-lg font-bold text-sm">
-                    ৳ {memberBalance}
-                  </div>
+            return (
+              <Reorder.Item
+                key={item._id}
+                value={item}
+                dragListener={isAdmin} // 👈 এডমিন লগইন থাকলে টেনে সরানো যাবে
+                whileDrag={{
+                  scale: 1.03, // চেপে ধরার পর হালকা বড় ও ভাসমান দেখাবে
+                  boxShadow: "0px 10px 25px rgba(0,0,0,0.3)",
+                  zIndex: 50,
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                className="touch-none select-none cursor-grab active:cursor-grabbing"
+              >
+                <div className="flex items-center gap-2 bg-amber-500 text-black p-3.5 rounded-2xl shadow-lg hover:bg-amber-400 transition">
+                  {isAdmin && (
+                    <div className="text-gray-800 font-bold px-1 text-xl opacity-75">
+                      ⋮⋮
+                    </div>
+                  )}
+
+                  <Link href={`/shonchoi/${item._id}`} className="flex-1">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h1 className="font-bold text-lg">{item.name}</h1>
+                        <p className="text-xs text-gray-800">{item.phone}</p>
+                        <p className="text-xs text-gray-800">{item.adress}</p>
+                      </div>
+                      <div className="bg-amber-600 text-white px-3 py-1 rounded-lg font-bold text-sm">
+                        ৳ {memberBalance}
+                      </div>
+                    </div>
+                  </Link>
+
+                  {/* Edit & Delete Buttons */}
+                  {isAdmin && (
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => {
+                          setEditMember(item)
+                          setName(item.name)
+                          setAdress(item.adress)
+                          setPhone(item.phone || "")
+                          setShowAddPopup(true)
+                        }}
+                        className="bg-blue-600 text-white text-xs px-2.5 py-3 rounded-xl font-bold hover:bg-blue-700"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => handleDeleteMember(item._id)}
+                        className="bg-red-600 text-white text-xs px-2.5 py-3 rounded-xl font-bold hover:bg-red-700"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  )}
                 </div>
-              </Link>
-
-              {/* Edit & Delete Buttons (Admin Only) */}
-              {isAdmin && (
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => {
-                      setEditMember(item)
-                      setName(item.name)
-                      setAdress(item.adress)
-                      setPhone(item.phone)
-
-                      setShowAddPopup(true)
-                    }}
-                    className="bg-blue-600 text-white text-xs px-2.5 py-3 rounded-xl font-bold hover:bg-blue-700"
-                  >
-                    ✏️
-                  </button>
-                  <button
-                    onClick={() => handleDeleteMember(item._id)}
-                    className="bg-red-600 text-white text-xs px-2.5 py-3 rounded-xl font-bold hover:bg-red-700"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              )}
-            </div>
-          )
-        })}
+              </Reorder.Item>
+            )
+          })}
+        </Reorder.Group>
       </div>
 
-      {/* Add Button (Admin Only) */}
+      {/* Add Button */}
       {isAdmin && (
         <div className="text-center text-4xl font-bold text-red-500 mt-6">
           <button
@@ -211,9 +254,9 @@ export default function Shonchoi() {
         </div>
       )}
 
-      {/* Add/Edit Member Modal */}
+      {/* Add/Edit Modal */}
       {showAddPopup && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
           <div className="bg-white text-black p-5 rounded-lg w-80 shadow-2xl">
             <h2 className="text-xl font-bold mb-4 text-center">
               {editMember ? "EDIT MEMBER" : "NEW ENTRY"}
@@ -236,7 +279,7 @@ export default function Shonchoi() {
               type="text"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="মোবাইল নাম্বার লিখুন "
+              placeholder="মোবাইল নাম্বার লিখুন"
               className="border w-full p-2 mb-4 rounded"
             />
             <div className="flex justify-between font-bold">
@@ -253,7 +296,7 @@ export default function Shonchoi() {
 
       {/* Admin Login Modal */}
       {showLoginPopup && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
           <div className="bg-white text-black p-5 rounded-lg w-80 shadow-2xl">
             <h2 className="text-xl font-bold mb-3 text-center">ADMIN LOGIN</h2>
             <p className="text-xs text-gray-600 mb-3 text-center">৮ অক্ষরের পাসওয়ার্ড পিন টাইপ করুন</p>

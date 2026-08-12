@@ -13,8 +13,8 @@ const transactionSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  comments:{
-    type:String,
+  comments: {
+    type: String,
   },
 })
 
@@ -28,8 +28,12 @@ const memberSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    phone:{
-       type: String,
+    phone: {
+      type: String,
+    },
+    order: {
+      type: Number,
+      default: 0, // 👈 পজিশন ট্র্যাক করার ফিল্ড
     },
     transactions: [transactionSchema],
   },
