@@ -18,7 +18,6 @@ function MemberCard({
   handleDeleteMember,
 }) {
   const dragControls = useDragControls()
-const dragControls = useDragControls()
 const totalAshol = Number(item.ashol) || 0
   const totalAdai = item.transactions?.reduce((acc, t) => acc + (Number(t.joma) || 0), 0) || 0
   const oboshishto = totalAshol - totalAdai
