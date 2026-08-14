@@ -1,5 +1,5 @@
 import { connectDB } from "@/lib/mongodb1"
-import Member2 from "@/models/members"
+import Member2 from "@/models/members2"
 import { NextResponse } from "next/server"
 
 // GET: Order অনুযায়ী সর্ট করে ডাটা লোড করবে
