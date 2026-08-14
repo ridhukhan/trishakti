@@ -3,7 +3,6 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Reorder, useDragControls } from "framer-motion"
 
-// 🔹 সিঙ্গেল কার্ড কম্পোনেন্ট (শুধুমাত্র আইকনে ড্রাগ অন করার জন্য)
 function MemberCard({
   item,
   isAdmin,
@@ -18,7 +17,9 @@ function MemberCard({
   handleDeleteMember,
 }) {
   const dragControls = useDragControls()
-
+const totalAshol = Number(item.ashol) || 0
+  const totalAdai = item.transactions?.reduce((acc, t) => acc + (Number(t.joma) || 0), 0) || 0
+  const oboshishto = totalAshol - totalAdai
   return (
     <Reorder.Item
       key={item._id}
@@ -49,6 +50,9 @@ function MemberCard({
           <div>
             <div className="text-center mb-2 border-b border-black/10 pb-1">
               <h1 className="font-bold text-lg">{item.name}</h1>
+              <div className="bg-red-700 text-white px-2.5 py-1 rounded-lg font-bold text-xs whitespace-nowrap shadow-sm">
+                অবশিষ্ট: ৳{oboshishto}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-1 text-xs text-gray-900 font-semibold">
