@@ -39,7 +39,7 @@ export default function Home() {
             isAdmin ? "bg-red-600 hover:bg-red-700" : "bg-emerald-600 hover:bg-emerald-700"
           }`}
         >
-          {isAdmin ? "এডমিন লগআউট" : "এডমিন লগইন"}
+          {isAdmin ? "🚶‍♂️" : "👨‍💼"}
         </button>
 
         <h1 className="font-extrabold text-3xl md:text-5xl text-amber-400 tracking-wide drop-shadow-md">
