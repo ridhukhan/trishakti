@@ -12,7 +12,7 @@ export default function MemberDetails({ params }) {
   const [joma, setJoma] = useState("")
   const [uttolon, setUttolon] = useState("")
   const [comments,setComments]=useState("")
-
+const [loading ,setLoading]=useState(false)
   useEffect(() => {
     fetchMemberDetails()
     const adminState = localStorage.getItem("isAdmin")
@@ -29,6 +29,7 @@ export default function MemberDetails({ params }) {
   const handleSaveTransaction = async (e) => {
     e.preventDefault()
     if (!date) return alert("তারিখ দিন!")
+    setLoading(true)
 
     if (editingTx) {
       // Update transaction
@@ -51,7 +52,9 @@ export default function MemberDetails({ params }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ date, joma, uttolon ,comments}),
       })
-    }
+    } 
+  setLoading(false)
+    
 
     // Reset Form
     setDate("")
@@ -205,8 +208,10 @@ export default function MemberDetails({ params }) {
               className="border w-full p-2 mb-3 rounded"
             />
             <div className="flex justify-between font-bold">
-              <button onClick={handleSaveTransaction} className="bg-green-600 text-white px-4 py-2 rounded">
-                SAVE
+              <button 
+              disabled={loading}
+              onClick={handleSaveTransaction} className="bg-green-600 text-white px-4 py-2 rounded">
+              {loading?"loading":"save"}
               </button>
               <button onClick={() => setShowpopup(false)} className="bg-gray-500 text-white px-4 py-2 rounded">
                 CANCEL
