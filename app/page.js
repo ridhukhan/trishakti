@@ -19,7 +19,7 @@ export default function Home() {
       alert("লগআউট করা হয়েছে")
     } else {
       const pin = prompt("এডমিন পিন নম্বর দিন:")
-      if (pin === "1234") { // আপনার সঠিক পিন দিন
+      if (pin === "Samir82@") { // আপনার সঠিক পিন দিন
         localStorage.setItem("isAdmin", "true")
         setIsAdmin(true)
         alert("এডমিন লগইন সফল হয়েছে!")
