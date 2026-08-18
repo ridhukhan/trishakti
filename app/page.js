@@ -33,6 +33,7 @@ export default function Home() {
     <div className="bg-slate-900 min-h-screen text-white flex flex-col justify-between font-sans">
       {/* Header Section */}
       <header className="bg-slate-800 border-b border-slate-700 shadow-lg py-6 text-center px-4 relative">
+       
         <button
           onClick={handleAdminLogin}
           className={`absolute top-4 right-4 text-xs font-bold px-3 py-2 rounded-lg transition ${
@@ -41,14 +42,18 @@ export default function Home() {
         >
           {isAdmin ? "🚶‍♂️" : "👨‍💼"}
         </button>
-
-        <h1 className="font-extrabold text-3xl md:text-5xl text-amber-400 tracking-wide drop-shadow-md">
+ <div className="flex gap-9">
+  <img src="https://res.cloudinary.com/dfzaefrkt/image/upload/v1787029233/WhatsApp_Image_2026-08-18_at_10.56.30_AM_s2jtbp.jpg"
+        className="rounded-full h-18 w-17  left-0 border-2 border-b-cyan-600 border-solid"
+        />
+        <h1 className="font-extrabold mt-3 text-3xl md:text-5xl text-amber-400 tracking-wide drop-shadow-md">
           রাধা-কৃষ্ণ সেবা সংঘ
         </h1>
-        <h3 className="mt-5 text-cyan-400">(একটি ধর্মীয় সেবামূলক সংগঠন)</h3>
+ </div>
+        <div> <h3 className=" text-cyan-400">(একটি ধর্মীয় সেবামূলক সংগঠন)</h3>
         <p className="text-slate-400 text-sm md:text-base mt-1 font-medium tracking-wider">
           প্রতিষ্ঠাকাল - ২১/০৫/২০০৭
-        </p>
+        </p></div>
       </header>
 
       {/* Main Content Section */}

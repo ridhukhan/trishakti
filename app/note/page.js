@@ -64,7 +64,8 @@ export default function Note() {
         <textarea
           value={fulltext}
           onChange={(e) => setFulltext(e.target.value)}
-          className="w-full flex-1 bg-slate-900 text-slate-100 p-4 border-none focus:outline-none font-mono leading-relaxed resize-none"
+          className="w-full flex-1 bg-slate-900 text-slate-100 p-4 border-none
+           focus:outline-none font-mono leading-relaxed resize-none"
           placeholder="Type your notes here..."
         />
 
