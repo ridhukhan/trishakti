@@ -1,4 +1,5 @@
 'use client'
+
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 
@@ -38,9 +39,9 @@ export default function Note() {
       })
 
       if (res.ok) {
-        alert("নোট সফলভাবে সংরক্ষণ করা হয়েছে!")
+        alert("নোট সফলভাবে সংরক্ষণ করা হয়েছে!")
       } else {
-        alert("সংরক্ষণ করতে সমস্যা হয়েছে।")
+        alert("সংরক্ষণ করতে সমস্যা হয়েছে।")
       }
     } catch (err) {
       alert("Error saving note")
@@ -58,27 +59,29 @@ export default function Note() {
   }
 
   return (
-    <div className="bg-slate-900 h-screen w-screen font-sans flex flex-col overflow-hidden">
-      <form onSubmit={handleSubmit} className="flex-1 flex flex-col h-full w-full">
-        <div className="p-3 bg-slate-900 border-t border-slate-800 flex justify-end">
+    <div className="bg-slate-900 h-screen w-screen font-sans flex flex-col pb-16 overflow-hidden">
+      <form onSubmit={handleSubmit} className="flex-1 flex flex-col h-full w-full overflow-hidden">
+        
+        {/* Top Header & Save Button */}
+        <div className="p-3 bg-slate-900 border-b border-slate-800 flex justify-between items-center shrink-0">
+          <h2 className="text-lg font-bold text-amber-400">ব্যক্তিগত নোট</h2>
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-xl transition duration-200 disabled:opacity-50"
+            className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 px-5 rounded-xl transition duration-200 disabled:opacity-50 text-sm"
           >
             {loading ? "saving..." : "Save Note"}
           </button>
         </div>
-        {/* Full Screen Textarea (Top to Bottom gap space reduced) */}
+
+        {/* Scrollable Textarea */}
         <textarea
           value={fulltext}
           onChange={(e) => setFulltext(e.target.value)}
-          className="w-full flex-1 bg-slate-900 text-slate-100 p-4 border-none
-           focus:outline-none font-mono leading-relaxed resize-none"
+          className="w-full flex-1 bg-slate-900 text-slate-100 p-4 border-none focus:outline-none font-mono leading-relaxed resize-none overflow-y-auto"
           placeholder="Type your notes here..."
         />
 
-        
       </form>
     </div>
   )
