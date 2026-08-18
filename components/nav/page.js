@@ -54,11 +54,27 @@ export default function Navbar() {
           </li>
         </Link>
 
+        <Link href="/rin">
+          <li className={`px-3 py-2 font-bold text-sm border-b-2 rounded-t-md transition-colors ${
+            pathname === "/rin" ? "text-red-500 border-red-500" : "text-white border-transparent"
+          }`}>
+            ঋণ
+          </li>
+        </Link>
+
         <Link href="/shonchoi1">
           <li className={`px-3 py-2 font-bold text-sm border-b-2 rounded-t-md transition-colors ${
             pathname === "/shonchoi1" ? "text-red-500 border-red-500" : "text-white border-transparent"
           }`}>
             সঞ্চয় ১
+          </li>
+        </Link>
+
+        <Link href="/rin1">
+          <li className={`px-3 py-2 font-bold text-sm border-b-2 rounded-t-md transition-colors ${
+            pathname === "/rin1" ? "text-red-500 border-red-500" : "text-white border-transparent"
+          }`}>
+          ঋণ ১
           </li>
         </Link>
 
@@ -74,23 +90,7 @@ export default function Navbar() {
           <li className={`px-3 py-2 font-bold text-sm border-b-2 rounded-t-md transition-colors ${
             pathname === "/shonchoi3" ? "text-red-500 border-red-500" : "text-white border-transparent"
           }`}>
-            সঞ্চয় ৩
-          </li>
-        </Link>
-
-        <Link href="/rin">
-          <li className={`px-3 py-2 font-bold text-sm border-b-2 rounded-t-md transition-colors ${
-            pathname === "/rin" ? "text-red-500 border-red-500" : "text-white border-transparent"
-          }`}>
-            ঋণ
-          </li>
-        </Link>
-
-        <Link href="/rin1">
-          <li className={`px-3 py-2 font-bold text-sm border-b-2 rounded-t-md transition-colors ${
-            pathname === "/rin1" ? "text-red-500 border-red-500" : "text-white border-transparent"
-          }`}>
-            ঋণ ১
+          সঞ্চয় ৩
           </li>
         </Link>
 
