@@ -5,7 +5,6 @@ import Note from "@/models/note"; // আপনার Note মডেলের প
 export async function GET() {
   try {
     await connectDB();
-    // ডাটাবেজের প্রথম নোটটি নিয়ে আসা
     const note = await Note.findOne({});
     return NextResponse.json({ text: note ? note.text : "" }, { status: 200 });
   } catch (error) {
