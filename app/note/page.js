@@ -60,16 +60,6 @@ export default function Note() {
   return (
     <div className="bg-slate-900 h-screen w-screen font-sans flex flex-col overflow-hidden">
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col h-full w-full">
-        {/* Full Screen Textarea (Top to Bottom gap space reduced) */}
-        <textarea
-          value={fulltext}
-          onChange={(e) => setFulltext(e.target.value)}
-          className="w-full flex-1 bg-slate-900 text-slate-100 p-4 border-none
-           focus:outline-none font-mono leading-relaxed resize-none"
-          placeholder="Type your notes here..."
-        />
-
-        {/* Bottom Save Button */}
         <div className="p-3 bg-slate-900 border-t border-slate-800 flex justify-end">
           <button
             type="submit"
@@ -79,6 +69,16 @@ export default function Note() {
             {loading ? "saving..." : "Save Note"}
           </button>
         </div>
+        {/* Full Screen Textarea (Top to Bottom gap space reduced) */}
+        <textarea
+          value={fulltext}
+          onChange={(e) => setFulltext(e.target.value)}
+          className="w-full flex-1 bg-slate-900 text-slate-100 p-4 border-none
+           focus:outline-none font-mono leading-relaxed resize-none"
+          placeholder="Type your notes here..."
+        />
+
+        
       </form>
     </div>
   )
