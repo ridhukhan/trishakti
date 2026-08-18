@@ -8,7 +8,7 @@ export default function Navbar() {
 
   return (
     <nav className="fixed bottom-0 left-0 w-full z-[1000] bg-slate-900 border-t border-slate-700 p-2 shadow-lg">
-      <ul className="flex overflow-x-hidden items-center whitespace-nowrap gap-2">
+      <ul className="flex overflow-x-auto items-center whitespace-nowrap gap-2">
         
         <Link href="/">
            
