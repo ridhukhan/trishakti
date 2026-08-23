@@ -1,10 +1,34 @@
 'use client'
 
 import { useState, useEffect } from "react"
-import Link from "next/link"
 
 export default function Home() {
   const [isAdmin, setIsAdmin] = useState(false)
+  const [uploading, setUploading] = useState(false)
+
+  // প্রাথমিক স্টেট (আপনি পরবর্তীতে ডাটাবেজ থেকে ডাটা লোড করতে পারবেন)
+  const [founders, setFounders] = useState([
+    { id: 1, name: "প্রতিষ্ঠাতা ১", image: "https://via.placeholder.com/150" },
+    { id: 2, name: "প্রতিষ্ঠাতা ২", image: "https://via.placeholder.com/150" },
+  ])
+
+  const [directors, setDirectors] = useState([
+    { id: 1, name: "পরিচালক ১", image: "https://via.placeholder.com/150" },
+    { id: 2, name: "পরিচালক ২", image: "https://via.placeholder.com/150" },
+    { id: 3, name: "পরিচালক ৩", image: "https://via.placeholder.com/150" },
+  ])
+
+  const [partners, setPartners] = useState([
+    { id: 1, name: "অংশীদার ১", image: "https://via.placeholder.com/150" },
+    { id: 2, name: "অংশীদার ২", image: "https://via.placeholder.com/150" },
+    { id: 3, name: "অংশীদার ৩", image: "https://via.placeholder.com/150" },
+    { id: 4, name: "অংশীদার ৪", image: "https://via.placeholder.com/150" },
+    { id: 5, name: "অংশীদার ৫", image: "https://via.placeholder.com/150" },
+    { id: 6, name: "অংশীদার ৬", image: "https://via.placeholder.com/150" },
+    { id: 7, name: "অংশীদার ৭", image: "https://via.placeholder.com/150" },
+    { id: 8, name: "অংশীদার ৮", image: "https://via.placeholder.com/150" },
+    { id: 9, name: "অংশীদার ৯", image: "https://via.placeholder.com/150" },
+  ])
 
   useEffect(() => {
     const adminState = localStorage.getItem("isAdmin")
@@ -13,12 +37,63 @@ export default function Home() {
     }
   }, [])
 
+  // Cloudinary Direct Image Upload Functionality
+  const handleImageUpload = async (e, category, index) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    setUploading(true)
+    const formData = new FormData()
+    formData.append("file", file)
+    formData.append("upload_preset", "ml_default") // Cloudinary te create kora Unsigned Upload Preset name dynamic rakhun
+
+    try {
+      const res = await fetch("https://api.cloudinary.com/v1_1/dfzaefrkt/image/upload", {
+        method: "POST",
+        body: formData,
+      })
+      const data = await res.json()
+
+      if (data.secure_url) {
+        const imageUrl = data.secure_url
+
+        if (category === "founders") {
+          const updated = [...founders]
+          updated[index].image = imageUrl
+          setFounders(updated)
+        } else if (category === "directors") {
+          const updated = [...directors]
+          updated[index].image = imageUrl
+          setDirectors(updated)
+        } else if (category === "partners") {
+          const updated = [...partners]
+          updated[index].image = imageUrl
+          setPartners(updated)
+        }
+      }
+    } catch (err) {
+      alert("ছবি আপলোড ব্যর্থ হয়েছে!")
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  // নতুন অংশীদার যোগ করার ফাংশন
+  const handleAddPartner = () => {
+    const newPartner = {
+      id: partners.length + 1,
+      name: `অংশীদার ${partners.length + 1}`,
+      image: "https://via.placeholder.com/150",
+    }
+    setPartners([...partners, newPartner])
+  }
+
   return (
-    <div className="bg-slate-900 min-h-screen text-white flex flex-col justify-between font-sans pb-20">
+    <div className="bg-slate-900 min-h-screen text-white flex flex-col justify-between font-sans pb-24">
       {/* Header Section */}
       <header className="bg-slate-800 border-b border-slate-700 shadow-lg py-6 text-center px-4">
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-2">
-          <img 
+          <img
             src="https://res.cloudinary.com/dfzaefrkt/image/upload/v1787029233/WhatsApp_Image_2026-08-18_at_10.56.30_AM_s2jtbp.jpg"
             alt="Logo"
             className="rounded-full h-16 w-16 object-cover border-2 border-cyan-600 shadow-md"
@@ -35,84 +110,127 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main Content Section */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
-          
-          <Link href="/shonchoi" className="group">
-            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 text-center shadow-xl hover:border-emerald-500 hover:scale-105 transition-all duration-300">
-              <div className="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-emerald-500 group-hover:text-white transition-all">
-                <span className="text-3xl">💰</span>
-              </div>
-              <h3 className="text-2xl font-bold text-emerald-400 mb-2">সঞ্চয় হিসাব</h3>
-              <p className="text-slate-400 text-sm">সকল সদস্যের সঞ্চয়, জমা ও উত্তোলনের সম্পূর্ণ হিসাব দেখুন</p>
-            </div>
-          </Link>
-
-          <Link href="/rin" className="group">
-            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 text-center shadow-xl hover:border-amber-500 hover:scale-105 transition-all duration-300">
-              <div className="w-16 h-16 bg-amber-500/10 text-amber-400 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-amber-500 group-hover:text-white transition-all">
-                <span className="text-3xl">📝</span>
-              </div>
-              <h3 className="text-2xl font-bold text-amber-400 mb-2">ঋণ হিসাব</h3>
-              <p className="text-slate-400 text-sm">সদস্যদের দেওয়া ঋণ ও কিস্তির হিসাব পরিচালনা করুন</p>
-            </div>
-          </Link>
-
-          <Link href="/shonchoi1" className="group">
-            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 text-center shadow-xl hover:border-emerald-500 hover:scale-105 transition-all duration-300">
-              <div className="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-emerald-500 group-hover:text-white transition-all">
-                <span className="text-3xl">💰</span>
-              </div>
-              <h3 className="text-2xl font-bold text-emerald-400 mb-2">সঞ্চয় হিসাব ১</h3>
-              <p className="text-slate-400 text-sm">সকল সদস্যের সঞ্চয়, জমা ও উত্তোলনের সম্পূর্ণ হিসাব দেখুন</p>
-            </div>
-          </Link>
-
-          <Link href="/rin1" className="group">
-            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 text-center shadow-xl hover:border-amber-500 hover:scale-105 transition-all duration-300">
-              <div className="w-16 h-16 bg-amber-500/10 text-amber-400 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-amber-500 group-hover:text-white transition-all">
-                <span className="text-3xl">📝</span>
-              </div>
-              <h3 className="text-2xl font-bold text-amber-400 mb-2">ঋণ হিসাব ১</h3>
-              <p className="text-slate-400 text-sm">সদস্যদের দেওয়া ঋণ ও কিস্তির হিসাব পরিচালনা করুন</p>
-            </div>
-          </Link>
-
-          <Link href="/shonchoi2" className="group">
-            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 text-center shadow-xl hover:border-emerald-500 hover:scale-105 transition-all duration-300">
-              <div className="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-emerald-500 group-hover:text-white transition-all">
-                <span className="text-3xl">💰</span>
-              </div>
-              <h3 className="text-2xl font-bold text-emerald-400 mb-2">সঞ্চয় হিসাব ২</h3>
-              <p className="text-slate-400 text-sm">সকল সদস্যের সঞ্চয়, জমা ও উত্তোলনের সম্পূর্ণ হিসাব দেখুন</p>
-            </div>
-          </Link>
-
-          <Link href="/shonchoi3" className="group">
-            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 text-center shadow-xl hover:border-emerald-500 hover:scale-105 transition-all duration-300">
-              <div className="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-emerald-500 group-hover:text-white transition-all">
-                <span className="text-3xl">💰</span>
-              </div>
-              <h3 className="text-2xl font-bold text-emerald-400 mb-2">সঞ্চয় হিসাব ৩</h3>
-              <p className="text-slate-400 text-sm">সকল সদস্যের সঞ্চয়, জমা ও উত্তোলনের সম্পূর্ণ হিসাব দেখুন</p>
-            </div>
-          </Link>
-
-          {/* এডমিন লগইন থাকলে নোট অপশন দেখা যাবে */}
-          {isAdmin && (
-            <Link href="/note" className="group col-span-1 md:col-span-2">
-              <div className="bg-slate-800 border border-amber-500/50 rounded-2xl p-6 text-center shadow-xl hover:border-amber-400 hover:scale-105 transition-all duration-300">
-                <div className="w-16 h-16 bg-amber-500/10 text-amber-400 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-amber-500 group-hover:text-white transition-all">
-                  <span className="text-3xl">📌</span>
+      {/* Main Members Section */}
+      <main className="flex-1 max-w-4xl mx-auto w-full px-4 py-8 space-y-12">
+        
+        {/* ১. প্রতিষ্ঠাতা সেকশন (২ টি গোল) */}
+        <section className="text-center">
+          <h2 className="text-xl md:text-2xl font-bold text-amber-400 mb-6 border-b border-slate-700 pb-2 inline-block px-6">
+            প্রতিষ্ঠাতা
+          </h2>
+          <div className="flex justify-center items-center gap-6 sm:gap-12 flex-wrap">
+            {founders.map((item, idx) => (
+              <div key={item.id} className="group relative flex flex-col items-center">
+                <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full p-1 bg-gradient-to-tr from-cyan-500 to-amber-400 shadow-xl group-hover:scale-105 transition-transform duration-300">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full rounded-full object-cover border-2 border-slate-900"
+                  />
                 </div>
-                <h3 className="text-2xl font-bold text-amber-400 mb-2">NOTE</h3>
-                <p className="text-slate-400 text-sm">ব্যক্তিগত নোট তৈরি ও আপডেট করুন</p>
+                {isAdmin && (
+                  <label className="mt-2 text-xs bg-cyan-600 hover:bg-cyan-700 text-white py-1 px-3 rounded-full cursor-pointer transition shadow">
+                    {uploading ? "..." : "Change Pic"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleImageUpload(e, "founders", idx)}
+                    />
+                  </label>
+                )}
+                <span className="mt-2 font-semibold text-slate-300 group-hover:text-amber-400 transition">
+                  {item.name}
+                </span>
               </div>
-            </Link>
-          )}
+            ))}
+          </div>
+        </section>
 
-        </div>
+        {/* ২. পরিচালনায় সেকশন (৩ টি গোল) */}
+        <section className="text-center">
+          <h2 className="text-xl md:text-2xl font-bold text-amber-400 mb-6 border-b border-slate-700 pb-2 inline-block px-6">
+            পরিচালনায়
+          </h2>
+          <div className="grid grid-cols-3 gap-3 sm:gap-6 max-w-lg mx-auto">
+            {directors.map((item, idx) => (
+              <div key={item.id} className="group flex flex-col items-center">
+                <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-emerald-500 to-cyan-500 shadow-lg group-hover:scale-105 transition-transform duration-300">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full rounded-full object-cover border-2 border-slate-900"
+                  />
+                </div>
+                {isAdmin && (
+                  <label className="mt-2 text-[10px] sm:text-xs bg-emerald-600 hover:bg-emerald-700 text-white py-0.5 px-2 rounded-full cursor-pointer transition">
+                    Upload
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleImageUpload(e, "directors", idx)}
+                    />
+                  </label>
+                )}
+                <span className="mt-2 text-xs sm:text-sm font-medium text-slate-300 group-hover:text-emerald-400 transition">
+                  {item.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ৩. অংশীদারবৃন্দ সেকশন (৯ টি + Dynamic Add Option) */}
+        <section className="text-center">
+          <h2 className="text-xl md:text-2xl font-bold text-amber-400 mb-6 border-b border-slate-700 pb-2 inline-block px-6">
+            অংশীদারবৃন্দ
+          </h2>
+          
+          <div className="grid grid-cols-3 gap-4 sm:gap-8 max-w-xl mx-auto">
+            {partners.map((item, idx) => (
+              <div key={item.id} className="group flex flex-col items-center">
+                <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-amber-500 to-red-500 shadow-md group-hover:scale-105 transition-transform duration-300">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full rounded-full object-cover border-2 border-slate-900"
+                  />
+                </div>
+                {isAdmin && (
+                  <label className="mt-1 text-[10px] bg-amber-600 hover:bg-amber-700 text-slate-900 font-bold py-0.5 px-2 rounded-full cursor-pointer transition">
+                    Upload
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleImageUpload(e, "partners", idx)}
+                    />
+                  </label>
+                )}
+                <span className="mt-1 text-xs font-medium text-slate-300 group-hover:text-amber-400 transition">
+                  {item.name}
+                </span>
+              </div>
+            ))}
+
+            {/* এডমিন হলে অতিরিক্ত অংশীদার যোগ করার জন্য '+' প্লাস চিহ্ন */}
+            {isAdmin && (
+              <div
+                onClick={handleAddPartner}
+                className="flex flex-col items-center justify-center cursor-pointer group"
+              >
+                <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full border-2 border-dashed border-slate-500 group-hover:border-amber-400 flex items-center justify-center transition-colors bg-slate-800/50">
+                  <span className="text-3xl text-slate-400 group-hover:text-amber-400 font-bold">+</span>
+                </div>
+                <span className="mt-2 text-xs font-semibold text-slate-400 group-hover:text-amber-400">
+                  নতুন যুক্ত করুন
+                </span>
+              </div>
+            )}
+          </div>
+        </section>
+
       </main>
 
       {/* Footer Section */}
