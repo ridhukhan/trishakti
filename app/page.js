@@ -7,7 +7,7 @@ export default function HOME() {
   const [loading, setLoading] = useState(false)
 
   const CLOUD_NAME = "dfzaefrkt"
-  const UPLOAD_PRESET = "my_preset" // Cloudinary te create kora Unsigned Upload Preset name
+  const UPLOAD_PRESET = "ml_default" // Cloudinary te create kora Unsigned Upload Preset name
 
   const [founders, setFounders] = useState([
     { id: 1, name: "প্রতিষ্ঠাতা ১", image: "https://via.placeholder.com/150" },
