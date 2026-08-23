@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import dbConnect from "@/lib/db" // আপনার mongo dbConnect ফাইলের পাথ
+import dbConnect from "@/lib/mongodb1" // আপনার mongo dbConnect ফাইলের পাথ
 import Management from "@/models/Management"
 
 export async function GET() {
