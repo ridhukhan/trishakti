@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server"
-import dbConnect from "@/lib/mongodb1" // আপনার mongo dbConnect ফাইলের পাথ
+import { connectDB } from "@/lib/mongodb1"
+ // আপনার mongo dbConnect ফাইলের পাথ
 import Management from "@/models/Management"
 
 export async function GET() {
   try {
-    await dbConnect()
+    await connectDB()
     let data = await Management.findOne()
     
     if (!data) {
@@ -20,7 +21,7 @@ export async function GET() {
 export async function POST(request) {
   try {
     const body = await request.json()
-    await dbConnect()
+    await connectDB()
 
     const updatedData = await Management.findOneAndUpdate({}, body, {
       upsert: true,
