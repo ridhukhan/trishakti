@@ -6,7 +6,10 @@ export default function Home() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [uploading, setUploading] = useState(false)
 
-  // প্রাথমিক স্টেট (আপনি পরবর্তীতে ডাটাবেজ থেকে ডাটা লোড করতে পারবেন)
+  // Cloudinary Config (আপনার ক্রেডেনশিয়াল)
+  const CLOUD_NAME = "dfzaefrkt"
+  const UPLOAD_PRESET = "ml_default" // আপনার তৈরি করা Unsigned Preset নাম দিন (যেমন: my_preset)
+
   const [founders, setFounders] = useState([
     { id: 1, name: "প্রতিষ্ঠাতা ১", image: "https://via.placeholder.com/150" },
     { id: 2, name: "প্রতিষ্ঠাতা ২", image: "https://via.placeholder.com/150" },
@@ -37,24 +40,26 @@ export default function Home() {
     }
   }, [])
 
-  // Cloudinary Direct Image Upload Functionality
+  // Cloudinary Direct Image Upload Function
   const handleImageUpload = async (e, category, index) => {
     const file = e.target.files[0]
     if (!file) return
 
     setUploading(true)
+
     const formData = new FormData()
     formData.append("file", file)
-    formData.append("upload_preset", "ml_default") // Cloudinary te create kora Unsigned Upload Preset name dynamic rakhun
+    formData.append("upload_preset", UPLOAD_PRESET)
 
     try {
-      const res = await fetch("https://api.cloudinary.com/v1_1/dfzaefrkt/image/upload", {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
         method: "POST",
         body: formData,
       })
+
       const data = await res.json()
 
-      if (data.secure_url) {
+      if (res.ok && data.secure_url) {
         const imageUrl = data.secure_url
 
         if (category === "founders") {
@@ -70,15 +75,18 @@ export default function Home() {
           updated[index].image = imageUrl
           setPartners(updated)
         }
+
+        alert("ছবি সফলভাবে আপলোড হয়েছে!")
+      } else {
+        alert(`আপলোড ব্যর্থ হয়েছে: ${data.error?.message || "Unsigned Upload Preset চেক করুন"}`)
       }
     } catch (err) {
-      alert("ছবি আপলোড ব্যর্থ হয়েছে!")
+      alert("নেটওয়ার্ক ত্রুটি বা সমস্যা হয়েছে!")
     } finally {
       setUploading(false)
     }
   }
 
-  // নতুন অংশীদার যোগ করার ফাংশন
   const handleAddPartner = () => {
     const newPartner = {
       id: partners.length + 1,
@@ -90,30 +98,26 @@ export default function Home() {
 
   return (
     <div className="bg-slate-900 min-h-screen text-white flex flex-col justify-between font-sans pb-24">
-      {/* Header Section */}
+      {/* Header */}
       <header className="bg-slate-800 border-b border-slate-700 shadow-lg py-6 text-center px-4">
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-2">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-2">
           <img
             src="https://res.cloudinary.com/dfzaefrkt/image/upload/v1787029233/WhatsApp_Image_2026-08-18_at_10.56.30_AM_s2jtbp.jpg"
             alt="Logo"
             className="rounded-full h-16 w-16 object-cover border-2 border-cyan-600 shadow-md"
           />
-          <h1 className="font-extrabold text-2xl md:text-4xl text-amber-400 tracking-wide drop-shadow-md">
+          <h1 className="font-extrabold text-2xl md:text-4xl text-amber-400 tracking-wide">
             রাধা-কৃষ্ণ সেবা সংঘ
           </h1>
         </div>
-        <div>
-          <h3 className="text-cyan-400 text-sm md:text-base font-semibold">(একটি ধর্মীয় সেবামূলক সংগঠন)</h3>
-          <p className="text-slate-400 text-xs md:text-sm mt-1 font-medium tracking-wider">
-            প্রতিষ্ঠাকাল - ২১/০৫/২০০৭
-          </p>
-        </div>
+        <h3 className="text-cyan-400 text-sm md:text-base font-semibold">(একটি ধর্মীয় সেবামূলক সংগঠন)</h3>
+        <p className="text-slate-400 text-xs md:text-sm mt-1">প্রতিষ্ঠাকাল - ২১/০৫/২০০৭</p>
       </header>
 
-      {/* Main Members Section */}
+      {/* Main Content */}
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 py-8 space-y-12">
         
-        {/* ১. প্রতিষ্ঠাতা সেকশন (২ টি গোল) */}
+        {/* প্রতিষ্ঠাতা (২টি) */}
         <section className="text-center">
           <h2 className="text-xl md:text-2xl font-bold text-amber-400 mb-6 border-b border-slate-700 pb-2 inline-block px-6">
             প্রতিষ্ঠাতা
@@ -130,7 +134,7 @@ export default function Home() {
                 </div>
                 {isAdmin && (
                   <label className="mt-2 text-xs bg-cyan-600 hover:bg-cyan-700 text-white py-1 px-3 rounded-full cursor-pointer transition shadow">
-                    {uploading ? "..." : "Change Pic"}
+                    {uploading ? "আপলোড হচ্ছে..." : "ছবি পাল্টান"}
                     <input
                       type="file"
                       accept="image/*"
@@ -139,15 +143,13 @@ export default function Home() {
                     />
                   </label>
                 )}
-                <span className="mt-2 font-semibold text-slate-300 group-hover:text-amber-400 transition">
-                  {item.name}
-                </span>
+                <span className="mt-2 font-semibold text-slate-300">{item.name}</span>
               </div>
             ))}
           </div>
         </section>
 
-        {/* ২. পরিচালনায় সেকশন (৩ টি গোল) */}
+        {/* পরিচালনায় (৩টি) */}
         <section className="text-center">
           <h2 className="text-xl md:text-2xl font-bold text-amber-400 mb-6 border-b border-slate-700 pb-2 inline-block px-6">
             পরিচালনায়
@@ -173,20 +175,17 @@ export default function Home() {
                     />
                   </label>
                 )}
-                <span className="mt-2 text-xs sm:text-sm font-medium text-slate-300 group-hover:text-emerald-400 transition">
-                  {item.name}
-                </span>
+                <span className="mt-2 text-xs sm:text-sm font-medium text-slate-300">{item.name}</span>
               </div>
             ))}
           </div>
         </section>
 
-        {/* ৩. অংশীদারবৃন্দ সেকশন (৯ টি + Dynamic Add Option) */}
+        {/* অংশীদারবৃন্দ (৯টি + Add Option) */}
         <section className="text-center">
           <h2 className="text-xl md:text-2xl font-bold text-amber-400 mb-6 border-b border-slate-700 pb-2 inline-block px-6">
             অংশীদারবৃন্দ
           </h2>
-          
           <div className="grid grid-cols-3 gap-4 sm:gap-8 max-w-xl mx-auto">
             {partners.map((item, idx) => (
               <div key={item.id} className="group flex flex-col items-center">
@@ -208,13 +207,10 @@ export default function Home() {
                     />
                   </label>
                 )}
-                <span className="mt-1 text-xs font-medium text-slate-300 group-hover:text-amber-400 transition">
-                  {item.name}
-                </span>
+                <span className="mt-1 text-xs font-medium text-slate-300">{item.name}</span>
               </div>
             ))}
 
-            {/* এডমিন হলে অতিরিক্ত অংশীদার যোগ করার জন্য '+' প্লাস চিহ্ন */}
             {isAdmin && (
               <div
                 onClick={handleAddPartner}
@@ -233,7 +229,7 @@ export default function Home() {
 
       </main>
 
-      {/* Footer Section */}
+      {/* Footer */}
       <footer className="bg-slate-800/50 border-t border-slate-800 py-4 text-center text-slate-500 text-xs">
         <p>© {new Date().getFullYear()} Trishakti Foundation. All rights reserved.</p>
       </footer>
