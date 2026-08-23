@@ -2,13 +2,12 @@
 
 import { useState, useEffect } from "react"
 
-export default function Home() {
+export default function HOME() {
   const [isAdmin, setIsAdmin] = useState(false)
-  const [uploading, setUploading] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  // Cloudinary Config (আপনার ক্রেডেনশিয়াল)
   const CLOUD_NAME = "dfzaefrkt"
-  const UPLOAD_PRESET = "ml_default" // আপনার তৈরি করা Unsigned Preset নাম দিন (যেমন: my_preset)
+  const UPLOAD_PRESET = "my_preset" // Cloudinary te create kora Unsigned Upload Preset name
 
   const [founders, setFounders] = useState([
     { id: 1, name: "প্রতিষ্ঠাতা ১", image: "https://via.placeholder.com/150" },
@@ -38,15 +37,67 @@ export default function Home() {
     if (adminState === "true") {
       setIsAdmin(true)
     }
+
+    // MongoDB থেকে ডাটা ফেচ করা
+    fetch("/api/management")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.success && data.data) {
+          if (data.data.founders && data.data.founders.length > 0) setFounders(data.data.founders)
+          if (data.data.directors && data.data.directors.length > 0) setDirectors(data.data.directors)
+          if (data.data.partners && data.data.partners.length > 0) setPartners(data.data.partners)
+        }
+      })
+      .catch((err) => console.log("Data fetch error:", err))
   }, [])
 
-  // Cloudinary Direct Image Upload Function
+  // MongoDB-তে ডাটা সেভ করার ফাংশন
+  const saveToDatabase = async (updatedFounders, updatedDirectors, updatedPartners) => {
+    try {
+      const res = await fetch("/api/management", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          founders: updatedFounders,
+          directors: updatedDirectors,
+          partners: updatedPartners,
+        }),
+      })
+      const result = await res.json()
+      if (!result.success) {
+        alert("ডাটাবেজে সেভ করতে সমস্যা হয়েছে!")
+      }
+    } catch (err) {
+      console.error("Save error:", err)
+    }
+  }
+
+  // নাম পরিবর্তন করার জন্য
+  const handleNameChange = (category, index, newName) => {
+    if (category === "founders") {
+      const updated = [...founders]
+      updated[index].name = newName
+      setFounders(updated)
+      saveToDatabase(updated, directors, partners)
+    } else if (category === "directors") {
+      const updated = [...directors]
+      updated[index].name = newName
+      setDirectors(updated)
+      saveToDatabase(founders, updated, partners)
+    } else if (category === "partners") {
+      const updated = [...partners]
+      updated[index].name = newName
+      setPartners(updated)
+      saveToDatabase(founders, directors, updated)
+    }
+  }
+
+  // Cloudinary Image Upload & DB Update
   const handleImageUpload = async (e, category, index) => {
     const file = e.target.files[0]
     if (!file) return
 
-    setUploading(true)
-
+    setLoading(true)
     const formData = new FormData()
     formData.append("file", file)
     formData.append("upload_preset", UPLOAD_PRESET)
@@ -62,38 +113,45 @@ export default function Home() {
       if (res.ok && data.secure_url) {
         const imageUrl = data.secure_url
 
+        let newFounders = [...founders]
+        let newDirectors = [...directors]
+        let newPartners = [...partners]
+
         if (category === "founders") {
-          const updated = [...founders]
-          updated[index].image = imageUrl
-          setFounders(updated)
+          newFounders[index].image = imageUrl
+          setFounders(newFounders)
         } else if (category === "directors") {
-          const updated = [...directors]
-          updated[index].image = imageUrl
-          setDirectors(updated)
+          newDirectors[index].image = imageUrl
+          setDirectors(newDirectors)
         } else if (category === "partners") {
-          const updated = [...partners]
-          updated[index].image = imageUrl
-          setPartners(updated)
+          newPartners[index].image = imageUrl
+          setPartners(newPartners)
         }
 
-        alert("ছবি সফলভাবে আপলোড হয়েছে!")
+        await saveToDatabase(newFounders, newDirectors, newPartners)
+        alert("ছবি সফলভাবে আপলোড ও সেভ হয়েছে!")
       } else {
-        alert(`আপলোড ব্যর্থ হয়েছে: ${data.error?.message || "Unsigned Upload Preset চেক করুন"}`)
+        alert("আপলোড ব্যর্থ হয়েছে! Unsigned Preset চেক করুন।")
       }
     } catch (err) {
-      alert("নেটওয়ার্ক ত্রুটি বা সমস্যা হয়েছে!")
+      alert("নেটওয়ার্ক ত্রুটি হয়েছে!")
     } finally {
-      setUploading(false)
+      setLoading(false)
     }
   }
 
+  // নতুন অংশীদার যুক্ত করার জন্য
   const handleAddPartner = () => {
-    const newPartner = {
-      id: partners.length + 1,
-      name: `অংশীদার ${partners.length + 1}`,
-      image: "https://via.placeholder.com/150",
-    }
-    setPartners([...partners, newPartner])
+    const newPartnersList = [
+      ...partners,
+      {
+        id: partners.length + 1,
+        name: `অংশীদার ${partners.length + 1}`,
+        image: "https://via.placeholder.com/150",
+      },
+    ]
+    setPartners(newPartnersList)
+    saveToDatabase(founders, directors, newPartnersList)
   }
 
   return (
@@ -117,14 +175,14 @@ export default function Home() {
       {/* Main Content */}
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 py-8 space-y-12">
         
-        {/* প্রতিষ্ঠাতা (২টি) */}
+        {/* ১. প্রতিষ্ঠাতা */}
         <section className="text-center">
           <h2 className="text-xl md:text-2xl font-bold text-amber-400 mb-6 border-b border-slate-700 pb-2 inline-block px-6">
             প্রতিষ্ঠাতা
           </h2>
           <div className="flex justify-center items-center gap-6 sm:gap-12 flex-wrap">
             {founders.map((item, idx) => (
-              <div key={item.id} className="group relative flex flex-col items-center">
+              <div key={item.id || idx} className="group relative flex flex-col items-center">
                 <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full p-1 bg-gradient-to-tr from-cyan-500 to-amber-400 shadow-xl group-hover:scale-105 transition-transform duration-300">
                   <img
                     src={item.image}
@@ -132,31 +190,41 @@ export default function Home() {
                     className="w-full h-full rounded-full object-cover border-2 border-slate-900"
                   />
                 </div>
-                {isAdmin && (
-                  <label className="mt-2 text-xs bg-cyan-600 hover:bg-cyan-700 text-white py-1 px-3 rounded-full cursor-pointer transition shadow">
-                    {uploading ? "আপলোড হচ্ছে..." : "ছবি পাল্টান"}
+
+                {isAdmin ? (
+                  <div className="mt-2 flex flex-col gap-1 w-full max-w-[140px]">
                     <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => handleImageUpload(e, "founders", idx)}
+                      type="text"
+                      value={item.name}
+                      onChange={(e) => handleNameChange("founders", idx, e.target.value)}
+                      className="bg-slate-800 text-amber-300 text-xs text-center border border-slate-700 rounded px-2 py-1 focus:outline-none focus:border-amber-400"
                     />
-                  </label>
+                    <label className="text-[10px] bg-cyan-600 hover:bg-cyan-700 text-white py-1 px-2 rounded cursor-pointer transition text-center shadow">
+                      {loading ? "..." : "ছবি বদলান"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleImageUpload(e, "founders", idx)}
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <span className="mt-2 font-semibold text-slate-300">{item.name}</span>
                 )}
-                <span className="mt-2 font-semibold text-slate-300">{item.name}</span>
               </div>
             ))}
           </div>
         </section>
 
-        {/* পরিচালনায় (৩টি) */}
+        {/* ২. পরিচালনায় */}
         <section className="text-center">
           <h2 className="text-xl md:text-2xl font-bold text-amber-400 mb-6 border-b border-slate-700 pb-2 inline-block px-6">
             পরিচালনায়
           </h2>
           <div className="grid grid-cols-3 gap-3 sm:gap-6 max-w-lg mx-auto">
             {directors.map((item, idx) => (
-              <div key={item.id} className="group flex flex-col items-center">
+              <div key={item.id || idx} className="group flex flex-col items-center">
                 <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-emerald-500 to-cyan-500 shadow-lg group-hover:scale-105 transition-transform duration-300">
                   <img
                     src={item.image}
@@ -164,31 +232,41 @@ export default function Home() {
                     className="w-full h-full rounded-full object-cover border-2 border-slate-900"
                   />
                 </div>
-                {isAdmin && (
-                  <label className="mt-2 text-[10px] sm:text-xs bg-emerald-600 hover:bg-emerald-700 text-white py-0.5 px-2 rounded-full cursor-pointer transition">
-                    Upload
+
+                {isAdmin ? (
+                  <div className="mt-2 flex flex-col gap-1 w-full">
                     <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => handleImageUpload(e, "directors", idx)}
+                      type="text"
+                      value={item.name}
+                      onChange={(e) => handleNameChange("directors", idx, e.target.value)}
+                      className="bg-slate-800 text-emerald-300 text-xs text-center border border-slate-700 rounded px-1 py-0.5 focus:outline-none focus:border-emerald-400"
                     />
-                  </label>
+                    <label className="text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white py-0.5 px-2 rounded cursor-pointer transition text-center">
+                      Upload
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleImageUpload(e, "directors", idx)}
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <span className="mt-2 text-xs sm:text-sm font-medium text-slate-300">{item.name}</span>
                 )}
-                <span className="mt-2 text-xs sm:text-sm font-medium text-slate-300">{item.name}</span>
               </div>
             ))}
           </div>
         </section>
 
-        {/* অংশীদারবৃন্দ (৯টি + Add Option) */}
+        {/* ৩. অংশীদারবৃন্দ */}
         <section className="text-center">
           <h2 className="text-xl md:text-2xl font-bold text-amber-400 mb-6 border-b border-slate-700 pb-2 inline-block px-6">
             অংশীদারবৃন্দ
           </h2>
           <div className="grid grid-cols-3 gap-4 sm:gap-8 max-w-xl mx-auto">
             {partners.map((item, idx) => (
-              <div key={item.id} className="group flex flex-col items-center">
+              <div key={item.id || idx} className="group flex flex-col items-center">
                 <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-amber-500 to-red-500 shadow-md group-hover:scale-105 transition-transform duration-300">
                   <img
                     src={item.image}
@@ -196,18 +274,28 @@ export default function Home() {
                     className="w-full h-full rounded-full object-cover border-2 border-slate-900"
                   />
                 </div>
-                {isAdmin && (
-                  <label className="mt-1 text-[10px] bg-amber-600 hover:bg-amber-700 text-slate-900 font-bold py-0.5 px-2 rounded-full cursor-pointer transition">
-                    Upload
+
+                {isAdmin ? (
+                  <div className="mt-1 flex flex-col gap-1 w-full">
                     <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => handleImageUpload(e, "partners", idx)}
+                      type="text"
+                      value={item.name}
+                      onChange={(e) => handleNameChange("partners", idx, e.target.value)}
+                      className="bg-slate-800 text-amber-300 text-[10px] text-center border border-slate-700 rounded px-1 py-0.5 focus:outline-none"
                     />
-                  </label>
+                    <label className="text-[9px] bg-amber-600 hover:bg-amber-700 text-slate-900 font-bold py-0.5 px-1 rounded cursor-pointer transition text-center">
+                      Upload
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleImageUpload(e, "partners", idx)}
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <span className="mt-1 text-xs font-medium text-slate-300">{item.name}</span>
                 )}
-                <span className="mt-1 text-xs font-medium text-slate-300">{item.name}</span>
               </div>
             ))}
 
