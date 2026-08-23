@@ -101,6 +101,23 @@ const [loading ,setLoading]=useState(false)
         <p className="text-sm">{member.phone}</p>
 
       </nav>
+{isAdmin && (
+        <div className="text-center text-4xl font-bold text-yellow-400 mt-6">
+          <button
+            onClick={() => {
+              setEditingTx(null)
+              setDate("")
+              setJoma("")
+              setUttolon("")
+              setComments("")
+              setShowpopup(true)
+            }}
+            className="bg-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-red-700 text-white"
+          >
+            +
+          </button>
+        </div>
+      )}
 
       {/* Transaction List */}
       <div className="mt-5 space-y-3 max-w-md mx-auto">
@@ -152,24 +169,7 @@ const [loading ,setLoading]=useState(false)
       </div>
 
       {/* Add Button (Admin Only) */}
-      {isAdmin && (
-        <div className="text-center text-4xl font-bold text-yellow-400 mt-6">
-          <button
-            onClick={() => {
-              setEditingTx(null)
-              setDate("")
-              setJoma("")
-              setUttolon("")
-              setComments("")
-              setShowpopup(true)
-            }}
-            className="bg-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-red-700 text-white"
-          >
-            +
-          </button>
-        </div>
-      )}
-
+      
       {/* Add / Edit Transaction Modal */}
       {showpopup && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4">

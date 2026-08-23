@@ -120,7 +120,19 @@ export default function RinMemberDetails({ params }) {
           <span>মোট ঋণ: ৳{member.ashol}</span>
         </div>
       </nav>
-
+  {isAdmin && (
+        <div className="text-center text-4xl font-bold text-yellow-400 mt-6">
+          <button
+            onClick={() => {
+              resetForm()
+              setShowpopup(true)
+            }}
+            className="bg-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-red-700 text-white"
+          >
+            +
+          </button>
+        </div>
+      )}
       {/* Transaction List */}
       <div className="mt-5 space-y-3 max-w-md mx-auto">
         {member.transactions?.map((item) => (
@@ -168,19 +180,7 @@ export default function RinMemberDetails({ params }) {
       </div>
 
       {/* Add Button (Admin Only) */}
-      {isAdmin && (
-        <div className="text-center text-4xl font-bold text-yellow-400 mt-6">
-          <button
-            onClick={() => {
-              resetForm()
-              setShowpopup(true)
-            }}
-            className="bg-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-red-700 text-white"
-          >
-            +
-          </button>
-        </div>
-      )}
+    
 
       {/* Add / Edit Transaction Modal */}
       {showpopup && (
