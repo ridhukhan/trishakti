@@ -88,7 +88,7 @@ const [loading ,setLoading]=useState(false)
   }, 0) || 0
 
   return (
-    <div className="bg-blue-800 min-h-screen text-white p-4">
+    <div className="bg-blue-800 min-h-screen text-white p-4 pb-32">
       {/* Header */}
       <div className="max-w-md mx-auto mb-3">
         <Link href="/shonchoi" className="text-xs text-yellow-400 hover:underline inline-block font-semibold">
@@ -101,23 +101,6 @@ const [loading ,setLoading]=useState(false)
         <p className="text-sm">{member.phone}</p>
 
       </nav>
-{isAdmin && (
-        <div className="text-center text-4xl font-bold text-yellow-400 mt-6">
-          <button
-            onClick={() => {
-              setEditingTx(null)
-              setDate("")
-              setJoma("")
-              setUttolon("")
-              setComments("")
-              setShowpopup(true)
-            }}
-            className="bg-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-red-700 text-white"
-          >
-            +
-          </button>
-        </div>
-      )}
 
       {/* Transaction List */}
       <div className="mt-5 space-y-3 max-w-md mx-auto">
@@ -160,6 +143,23 @@ const [loading ,setLoading]=useState(false)
           </div>
         ))}
       </div>
+{isAdmin && (
+        <div className="text-center text-4xl font-bold text-yellow-400 mt-6">
+          <button
+            onClick={() => {
+              setEditingTx(null)
+              setDate("")
+              setJoma("")
+              setUttolon("")
+              setComments("")
+              setShowpopup(true)
+            }}
+            className="bg-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-red-700 text-white"
+          >
+            +
+          </button>
+        </div>
+      )}
 
       {/* Total Balance */}
       <div className="mt-6 text-center">

@@ -85,7 +85,7 @@ export default function MemberDetails({ params }) {
   }, 0) || 0
 
   return (
-    <div className="bg-blue-800 min-h-screen text-white p-4">
+    <div className="bg-blue-800 min-h-screen text-white p-4 pb-32">
       {/* Header */}
        <div className="max-w-md mx-auto mb-3">
         <Link href="/shonchoi1" className="text-xs text-yellow-400 hover:underline inline-block font-semibold">
@@ -98,24 +98,7 @@ export default function MemberDetails({ params }) {
         <p className="text-sm">{member.phone}</p>
 
       </nav>
- {/* Add Button (Admin Only) */}
-      {isAdmin && (
-        <div className="text-center text-4xl font-bold text-yellow-400 mt-6">
-          <button
-            onClick={() => {
-              setEditingTx(null)
-              setDate("")
-              setJoma("")
-              setUttolon("")
-              setComments("")
-              setShowpopup(true)
-            }}
-            className="bg-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-red-700 text-white"
-          >
-            +
-          </button>
-        </div>
-      )}
+ 
       {/* Transaction List */}
       <div className="mt-5 space-y-3 max-w-md mx-auto">
         {member.transactions?.map((item) => (
@@ -157,7 +140,24 @@ export default function MemberDetails({ params }) {
           </div>
         ))}
       </div>
-
+{/* Add Button (Admin Only) */}
+      {isAdmin && (
+        <div className="text-center text-4xl font-bold text-yellow-400 mt-6">
+          <button
+            onClick={() => {
+              setEditingTx(null)
+              setDate("")
+              setJoma("")
+              setUttolon("")
+              setComments("")
+              setShowpopup(true)
+            }}
+            className="bg-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-red-700 text-white"
+          >
+            +
+          </button>
+        </div>
+      )}
       {/* Total Balance */}
       <div className="mt-6 text-center">
         <div className="inline-block bg-yellow-400 text-black text-2xl font-bold px-6 py-2 rounded-full shadow-lg">

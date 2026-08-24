@@ -213,7 +213,7 @@ export default function Shonchoi() {
   }, 0)
 
   return (
-    <div className="bg-blue-800 min-h-screen text-white pb-10 relative">
+    <div className="bg-blue-800 min-h-screen text-white pb-32 relative">
       <div className="max-w-md mx-auto mb-3 pt-3 px-4">
         <Link
           href="/"
@@ -253,23 +253,7 @@ export default function Shonchoi() {
           সর্বমোট জমা: ৳ {grandTotal}
         </div>
       </div>
- {/* Add Button */}
-      {isAdmin && (
-        <div className="text-center text-4xl font-bold text-red-500 mt-6">
-          <button
-            onClick={() => {
-              setEditMember(null)
-              setName("")
-              setAdress("")
-              setPhone("")
-              setShowAddPopup(true)
-            }}
-            className="bg-white text-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-gray-100"
-          >
-            +
-          </button>
-        </div>
-      )}
+
       {/* Reorderable Member List */}
       <div className="flex flex-col items-center px-4">
         <Reorder.Group
@@ -294,7 +278,23 @@ export default function Shonchoi() {
         </Reorder.Group>
       </div>
 
-     
+      {/* Add Button */}
+      {isAdmin && (
+        <div className="text-center text-4xl font-bold text-red-500 mt-6">
+          <button
+            onClick={() => {
+              setEditMember(null)
+              setName("")
+              setAdress("")
+              setPhone("")
+              setShowAddPopup(true)
+            }}
+            className="bg-white text-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-gray-100"
+          >
+            +
+          </button>
+        </div>
+      )}
 
       {/* Add/Edit Modal */}
       {showAddPopup && (

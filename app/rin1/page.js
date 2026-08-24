@@ -239,7 +239,7 @@ export default function RinPage() {
   }, 0)
 
   return (
-    <div className="bg-blue-800 min-h-screen text-white pb-10 relative">
+    <div className="bg-blue-800 min-h-screen text-white pb-32 relative">
       <div className="max-w-md mx-auto mb-3 pt-3 px-4">
         <Link
           href="/"
@@ -279,20 +279,7 @@ export default function RinPage() {
           সর্বমোট অবশিষ্ট ঋণ: ৳ {grandOboshishto}
         </div>
       </div>
-{/* Add Button (Admin Only) */}
-      {isAdmin && (
-        <div className="text-center text-4xl font-bold text-red-500 mt-6">
-          <button
-            onClick={() => {
-              resetForm()
-              setShowAddPopup(true)
-            }}
-            className="bg-white text-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-gray-100"
-          >
-            +
-          </button>
-        </div>
-      )}
+
       {/* Reorderable Member List */}
       <div className="flex flex-col items-center px-4">
         <Reorder.Group
@@ -321,7 +308,20 @@ export default function RinPage() {
       </div>
 
       
-
+{/* Add Button (Admin Only) */}
+      {isAdmin && (
+        <div className="text-center text-4xl font-bold text-red-500 mt-6">
+          <button
+            onClick={() => {
+              resetForm()
+              setShowAddPopup(true)
+            }}
+            className="bg-white text-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-gray-100"
+          >
+            +
+          </button>
+        </div>
+      )}
       {/* Add/Edit Popup */}
       {showAddPopup && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">

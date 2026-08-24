@@ -101,7 +101,7 @@ export default function RinMemberDetails({ params }) {
   const oboshishto = totalAshol - totalAdai
 
   return (
-    <div className="bg-blue-800 min-h-screen text-white p-4">
+    <div className="bg-blue-800 min-h-screen text-white p-4 pb-32">
       {/* Back Button & Header */}
       <div className="max-w-md mx-auto mb-3">
         <Link href="/rin" className="text-xs text-yellow-400 hover:underline inline-block font-semibold">
@@ -120,20 +120,7 @@ export default function RinMemberDetails({ params }) {
           <span>মোট ঋণ: ৳{member.ashol}</span>
         </div>
       </nav>
-{/* Add Button (Admin Only) */}
-      {isAdmin && (
-        <div className="text-center text-4xl font-bold text-yellow-400 mt-6">
-          <button
-            onClick={() => {
-              resetForm()
-              setShowpopup(true)
-            }}
-            className="bg-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-red-700 text-white"
-          >
-            +
-          </button>
-        </div>
-      )}
+
       {/* Transaction List */}
       <div className="mt-5 space-y-3 max-w-md mx-auto">
         {member.transactions?.map((item) => (
@@ -180,7 +167,20 @@ export default function RinMemberDetails({ params }) {
         </div>
       </div>
 
-      
+      {/* Add Button (Admin Only) */}
+      {isAdmin && (
+        <div className="text-center text-4xl font-bold text-yellow-400 mt-6">
+          <button
+            onClick={() => {
+              resetForm()
+              setShowpopup(true)
+            }}
+            className="bg-red-600 px-4 py-1 rounded-full shadow-lg hover:bg-red-700 text-white"
+          >
+            +
+          </button>
+        </div>
+      )}
 
       {/* Add / Edit Transaction Modal */}
       {showpopup && (
