@@ -66,7 +66,7 @@ export default function HOME() {
       })
       const result = await res.json()
       if (!result.success) {
-        alert("ডাটাবেজে সেভ করতে সমস্যা হয়েছে!")
+        alert("ডাটাবেজে সেভ করতে সমস্যা হয়েছে!")
       }
     } catch (err) {
       console.error("Save error:", err)
@@ -130,12 +130,12 @@ export default function HOME() {
         }
 
         await saveToDatabase(newFounders, newDirectors, newPartners)
-        alert("ছবি সফলভাবে আপলোড ও সেভ হয়েছে!")
+        alert("ছবি সফলভাবে আপলোড ও সেভ হয়েছে!")
       } else {
-        alert("আপলোড ব্যর্থ হয়েছে! Unsigned Preset চেক করুন।")
+        alert("আপলোড ব্যর্থ হয়েছে! Unsigned Preset চেক করুন।")
       }
     } catch (err) {
-      alert("নেটওয়ার্ক ত্রুটি হয়েছে!")
+      alert("নেটওয়ার্ক ত্রুটি হয়েছে!")
     } finally {
       setLoading(false)
     }
@@ -153,6 +153,15 @@ export default function HOME() {
     ]
     setPartners(newPartnersList)
     saveToDatabase(founders, directors, newPartnersList)
+  }
+
+  // অংশীদার মুছে ফেলার জন্য
+  const handleDeletePartner = (index) => {
+    if (confirm("আপনি কি নিশ্চিত যে এই অংশীদারকে মুছে ফেলতে চান?")) {
+      const updatedPartners = partners.filter((_, idx) => idx !== index)
+      setPartners(updatedPartners)
+      saveToDatabase(founders, directors, updatedPartners)
+    }
   }
 
   return (
@@ -192,13 +201,33 @@ export default function HOME() {
                   />
                 </div>
 
+                {isAdmin ? (
+                  <div className="mt-2 flex flex-col gap-1 w-full max-w-[140px]">
+                    <input
+                      type="text"
+                      value={item.name}
+                      onChange={(e) => handleNameChange("founders", idx, e.target.value)}
+                      className="bg-slate-800 text-amber-300 text-xs text-center border border-slate-700 rounded px-2 py-1 focus:outline-none focus:border-amber-400"
+                    />
+                    <label className="text-[10px] bg-cyan-600 hover:bg-cyan-700 text-white py-1 px-2 rounded cursor-pointer transition text-center shadow">
+                      {loading ? "..." : "ছবি বদলান"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleImageUpload(e, "founders", idx)}
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <span className="mt-2 font-semibold text-slate-300">{item.name}</span>
+                )}
               </div>
             ))}
-                
           </div>
         </section>
 
-       
+        {/* ২. পরিচালনায় */}
         <section className="text-center">
           <h2 className="text-xl md:text-2xl font-bold text-amber-400 mb-6 border-b border-slate-700 pb-2 inline-block px-6">
             পরিচালনায়
@@ -264,15 +293,23 @@ export default function HOME() {
                       onChange={(e) => handleNameChange("partners", idx, e.target.value)}
                       className="bg-slate-800 text-amber-300 text-[10px] text-center border border-slate-700 rounded px-1 py-0.5 focus:outline-none"
                     />
-                    <label className="text-[9px] bg-amber-600 hover:bg-amber-700 text-slate-900 font-bold py-0.5 px-1 rounded cursor-pointer transition text-center">
-                      Upload
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => handleImageUpload(e, "partners", idx)}
-                      />
-                    </label>
+                    <div className="flex gap-1 justify-center">
+                      <label className="flex-1 text-[9px] bg-amber-600 hover:bg-amber-700 text-slate-900 font-bold py-0.5 px-1 rounded cursor-pointer transition text-center">
+                        Upload
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => handleImageUpload(e, "partners", idx)}
+                        />
+                      </label>
+                      <button
+                        onClick={() => handleDeletePartner(idx)}
+                        className="text-[9px] bg-red-600 hover:bg-red-700 text-white font-bold py-0.5 px-1.5 rounded transition"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <span className="mt-1 text-xs font-medium text-slate-300">{item.name}</span>
@@ -295,21 +332,21 @@ export default function HOME() {
             )}
           </div>
         </section>
-            <section>
-            <div>
-              {isAdmin && (
-            <Link href="/note" className="group col-span-1 md:col-span-2">
-              <div className="bg-slate-800 border border-amber-500/50 rounded-2xl p-6 text-center shadow-xl hover:border-amber-400 hover:scale-105 transition-all duration-300">
-                <div className="w-16 h-16 bg-amber-500/10 text-amber-400 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-amber-500 group-hover:text-white transition-all">
-                  <span className="text-3xl">📌</span>
-                </div>
-                <h3 className="text-2xl font-bold text-amber-400 mb-2">NOTE</h3>
-                <p className="text-slate-400 text-sm">ব্যক্তিগত নোট তৈরি ও আপডেট করুন</p>
-              </div>
-            </Link>
-          )}
-            </div>
-            </section>
+
+        {/* Note Section */}
+        {isAdmin && (
+          <section className="flex justify-center pt-4">
+            <Link href="/note" className="group w-full max-w-sm">
+              <div className="bg-slate-800 border border-amber-500/50 rounded-2xl p-6 text-center shadow-xl hover:border-amber-400 hover:scale-105 transition-all duration-300">
+                <div className="w-16 h-16 bg-amber-500/10 text-amber-400 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-amber-500 group-hover:text-white transition-all">
+                  <span className="text-3xl">📌</span>
+                </div>
+                <h3 className="text-2xl font-bold text-amber-400 mb-2">NOTE</h3>
+                <p className="text-slate-400 text-sm">ব্যক্তিগত নোট তৈরি ও আপডেট করুন</p>
+              </div>
+            </Link>
+          </section>
+        )}
 
       </main>
 
