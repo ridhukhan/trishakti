@@ -214,7 +214,7 @@ export default function Shonchoi() {
   }, 0)
 
   return (
-    <div className="bg-blue-800 min-h-screen text-white pb-10 relative">
+    <div className="bg-blue-800 min-h-screen text-white pb-32 relative">
       <div className="max-w-md mx-auto mb-3 pt-3 px-4">
         <Link
           href="/"
