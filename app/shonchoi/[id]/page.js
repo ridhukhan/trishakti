@@ -88,7 +88,7 @@ const [loading ,setLoading]=useState(false)
   }, 0) || 0
 
   return (
-    <div className="bg-blue-800 min-h-screen text-white p-4">
+    <div className="bg-blue-800 min-h-screen text-white p-4 pb-32">
       {/* Header */}
       <div className="max-w-md mx-auto mb-3">
         <Link href="/shonchoi" className="text-xs text-yellow-400 hover:underline inline-block font-semibold">
