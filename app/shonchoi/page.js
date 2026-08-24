@@ -136,6 +136,7 @@ export default function Shonchoi() {
       setShowLoginPopup(false)
       setPinInput("")
       alert("Admin Login Successful!")
+      window.location.reload()
     } else {
       alert(data.message || "ভুল পাসওয়ার্ড!")
     }

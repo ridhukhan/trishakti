@@ -26,6 +26,7 @@ export default function Navbar() {
         localStorage.setItem("isAdmin", "true")
         setIsAdmin(true)
         alert("এডমিন লগইন সফল হয়েছে!")
+        window.location.reload()
       } else if (pin !== null) {
         alert("ভুল পিন!")
       }
