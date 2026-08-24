@@ -201,27 +201,7 @@ export default function HOME() {
                   />
                 </div>
 
-                {isAdmin ? (
-                  <div className="mt-2 flex flex-col gap-1 w-full max-w-[140px]">
-                    <input
-                      type="text"
-                      value={item.name}
-                      onChange={(e) => handleNameChange("founders", idx, e.target.value)}
-                      className="bg-slate-800 text-amber-300 text-xs text-center border border-slate-700 rounded px-2 py-1 focus:outline-none focus:border-amber-400"
-                    />
-                    <label className="text-[10px] bg-cyan-600 hover:bg-cyan-700 text-white py-1 px-2 rounded cursor-pointer transition text-center shadow">
-                      {loading ? "..." : "ছবি বদলান"}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => handleImageUpload(e, "founders", idx)}
-                      />
-                    </label>
-                  </div>
-                ) : (
-                  <span className="mt-2 font-semibold text-slate-300">{item.name}</span>
-                )}
+              
               </div>
             ))}
           </div>
