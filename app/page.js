@@ -314,7 +314,17 @@ export default function HOME() {
             )}
           </div>
         </section>
-
+  {isAdmin && (
+            <Link href="/note" className="group col-span-1 md:col-span-2">
+              <div className="bg-slate-800 border border-amber-500/50 rounded-2xl p-6 text-center shadow-xl hover:border-amber-400 hover:scale-105 transition-all duration-300">
+                <div className="w-16 h-16 bg-amber-500/10 text-amber-400 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-amber-500 group-hover:text-white transition-all">
+                  <span className="text-3xl">📌</span>
+                </div>
+                <h3 className="text-2xl font-bold text-amber-400 mb-2">NOTE</h3>
+                <p className="text-slate-400 text-sm">ব্যক্তিগত নোট তৈরি ও আপডেট করুন</p>
+              </div>
+            </Link>
+          )}
       </main>
 
       {/* Footer */}
