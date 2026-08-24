@@ -314,7 +314,9 @@ export default function HOME() {
             )}
           </div>
         </section>
-  {isAdmin && (
+            <section>
+            <div>
+              {isAdmin && (
             <Link href="/note" className="group col-span-1 md:col-span-2">
               <div className="bg-slate-800 border border-amber-500/50 rounded-2xl p-6 text-center shadow-xl hover:border-amber-400 hover:scale-105 transition-all duration-300">
                 <div className="w-16 h-16 bg-amber-500/10 text-amber-400 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-amber-500 group-hover:text-white transition-all">
@@ -325,6 +327,9 @@ export default function HOME() {
               </div>
             </Link>
           )}
+            </div>
+            </section>
+
       </main>
 
       {/* Footer */}
